@@ -11,7 +11,6 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::dropIfExists('fav__dogs');
         Schema::create('fav_dogs', function (Blueprint $table) {
             $table->id();
             $table->foreignId('dog_id')->references('id')->on('dogs')->constrained();
@@ -26,11 +25,5 @@ return new class extends Migration
     public function down(): void
     {
         Schema::dropIfExists('fav_dogs');
-        Schema::create('fav__dogs', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('dog_id')->references('id')->on('dogs')->constrained();
-            $table->foreignId('volunteer_id')->references('id')->on('volunteers')->constrained();
-            #$table->timestamps();
-        });
     }
 };
