@@ -3,6 +3,7 @@
 namespace App\DTOs;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 
 class VolunteerDTO
 {
@@ -39,7 +40,7 @@ class VolunteerDTO
             'Name' => $this->name,
             'Last_Name' => $this->lastName,
             'Login' => $this->login,
-            'Password' => password_hash($this->password, PASSWORD_BCRYPT),
+            'Password' => Hash::make($this->password), 
             'Acc_State' => $this->accState,
         ];
     }
