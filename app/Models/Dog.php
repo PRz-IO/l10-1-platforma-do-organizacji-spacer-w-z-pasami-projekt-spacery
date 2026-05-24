@@ -14,15 +14,15 @@ class Dog extends Model
         'Age',
         'Behaviour',
         'State',
-        'Photo'
+        'Photo',
     ];
 
-    public function fav_dogs():HasMany
+    public function fav_dogs(): HasMany
     {
         return $this->hasMany(Fav_Dog::class);
     }
 
-    public function schedules():HasMany
+    public function schedules(): HasMany
     {
         return $this->hasMany(Schedule::class);
     }

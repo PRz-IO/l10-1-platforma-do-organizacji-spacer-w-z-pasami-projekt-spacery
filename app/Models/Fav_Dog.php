@@ -9,16 +9,16 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 #[WithoutTimestamps]
 class Fav_Dog extends Model
 {
-    protected $table ='fav_dogs';
+    protected $table = 'fav_dogs';
 
     protected $fillable = [];
 
-    public function dog():BelongsTo
+    public function dog(): BelongsTo
     {
         return $this->belongsTo(Dog::class);
     }
 
-    public function volunteer():BelongsTo
+    public function volunteer(): BelongsTo
     {
         return $this->belongsTo(Volunteer::class);
     }

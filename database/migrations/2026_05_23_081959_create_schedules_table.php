@@ -20,7 +20,7 @@ return new class extends Migration
             $table->foreignId('supervisor_id')->references('id')->on('workers')->constrained();
             $table->text('Note')->nullable();
             $table->integer('Grade')->nullable();
-            #$table->timestamps();
+            // $table->timestamps();
         });
     }
 

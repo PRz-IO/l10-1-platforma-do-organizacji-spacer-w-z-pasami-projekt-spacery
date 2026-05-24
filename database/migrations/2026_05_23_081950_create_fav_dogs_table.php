@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('dog_id')->references('id')->on('dogs')->constrained();
             $table->foreignId('volunteer_id')->references('id')->on('volunteers')->constrained();
-            #$table->timestamps();
+            // $table->timestamps();
         });
     }
 

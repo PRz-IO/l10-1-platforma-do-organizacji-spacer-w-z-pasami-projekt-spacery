@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('account_id')->references('id')->on('accounts')->constrained();
             $table->boolean('Is_Experienced')->default(false);
-            #$table->timestamps();
+            // $table->timestamps();
         });
     }
 
