@@ -11,15 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('dogs', function (Blueprint $table) {
+        Schema::create('volunteers', function (Blueprint $table) {
             $table->id();
-            $table->string('Name',80);
-            $table->integer('Age');
-            $table->text('Behaviour');
-            $table->string('State',80);
-            $table->string('Photo',120);
-            
-            #$table->timestamps();
+            $table->foreignId('account_id')->references('id')->on('accounts')->constrained();
+            $table->boolean('Is_Experienced')->default(false);
+            // $table->timestamps();
         });
     }
 
@@ -28,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('dogs');
+        Schema::dropIfExists('volunteers');
     }
 };

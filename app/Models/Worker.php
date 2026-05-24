@@ -10,14 +10,16 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 #[WithoutTimestamps]
 class Worker extends Model
 {
-        protected $fillable =[
-        'Is_Admin'
+    protected $fillable = [
+        'Is_Admin',
     ];
-    public function account():BelongsTo
+
+    public function account(): BelongsTo
     {
         return $this->belongsTo(Account::class);
     }
-    public function schedules():HasMany
+
+    public function schedules(): HasMany
     {
         return $this->hasMany(Schedule::class);
     }

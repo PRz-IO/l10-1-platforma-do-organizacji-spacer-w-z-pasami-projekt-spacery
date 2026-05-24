@@ -11,11 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('workers', function (Blueprint $table) {
+        Schema::create('fav_dogs', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('account_id')->references('id')->on('accounts')->constrained();
-            $table->boolean('Is_Admin')->default(false);
-            #$table->timestamps();
+            $table->foreignId('dog_id')->references('id')->on('dogs')->constrained();
+            $table->foreignId('volunteer_id')->references('id')->on('volunteers')->constrained();
+            // $table->timestamps();
         });
     }
 
@@ -24,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('workers');
+        Schema::dropIfExists('fav_dogs');
     }
 };

@@ -11,11 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('volunteers', function (Blueprint $table) {
+        Schema::create('workers', function (Blueprint $table) {
             $table->id();
             $table->foreignId('account_id')->references('id')->on('accounts')->constrained();
-            $table->boolean('Is_Experienced')->default(false);
-            #$table->timestamps();
+            $table->boolean('Is_Admin')->default(false);
+            // $table->timestamps();
         });
     }
 
@@ -24,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('volunteers');
+        Schema::dropIfExists('workers');
     }
 };

@@ -10,11 +10,10 @@ class DogDTO
         public readonly string $name,
         public readonly int $age,
         public readonly string $behaviour,
-        public readonly string $state = 'Ready',
+        public readonly string $state,
         public readonly string $photo
     ) {}
 
-    
     public static function fromRequest(Request $request): self
     {
         return new self(
@@ -26,7 +25,6 @@ class DogDTO
         );
     }
 
-    
     public function toArray(): array
     {
         return [

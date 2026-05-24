@@ -13,21 +13,21 @@ class Schedule extends Model
         'Date',
         'Time',
         'Note',
-        'Grade'
+        'Grade',
     ];
 
-    public function dog():BelongsTo
+    public function dog(): BelongsTo
     {
         return $this->belongsTo(Dog::class);
     }
-    
-    public function volunteer():BelongsTo
+
+    public function volunteer(): BelongsTo
     {
         return $this->belongsTo(Volunteer::class);
     }
 
-    public function worker():BelongsTo
+    public function worker(): BelongsTo
     {
-        return $this->belongsTo(Worker::class,'supervisor_id');
+        return $this->belongsTo(Worker::class, 'supervisor_id');
     }
 }

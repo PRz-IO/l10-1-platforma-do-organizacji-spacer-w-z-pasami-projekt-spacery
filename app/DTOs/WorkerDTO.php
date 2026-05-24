@@ -6,8 +6,7 @@ use Illuminate\Http\Request;
 
 final readonly class WorkerDTO
 {
-    public function __construct
-    (
+    public function __construct(
         public string $name,
         public string $lastName,
         public string $login,
@@ -16,10 +15,9 @@ final readonly class WorkerDTO
         public bool $isAdmin = false
     ) {}
 
-    public static function fromArray (array $data) : self
+    public static function fromArray(array $data): self
     {
-        return new self
-        (
+        return new self(
             name: $data['Name'],
             lastName: $data['Last_Name'],
             login: $data['Login'],
@@ -29,7 +27,7 @@ final readonly class WorkerDTO
         );
     }
 
-    public static function fromRequest(Request $request) : self
+    public static function fromRequest(Request $request): self
     {
         return self::fromArray($request->validated());
     }
@@ -41,7 +39,7 @@ final readonly class WorkerDTO
             'Last_Name' => $this->lastName,
             'Login' => $this->login,
             'Password' => brcypt($this->password),
-            'Acc_State' => $this->accState
+            'Acc_State' => $this->accState,
         ];
     }
 
@@ -49,7 +47,7 @@ final readonly class WorkerDTO
     {
         return [
             'Account_Id' => $accountId,
-            'Is_Admin' => $this->isAdmin
+            'Is_Admin' => $this->isAdmin,
         ];
     }
 }
