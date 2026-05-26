@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ isset($title) ? $title : 'Test'}}</title>
+    <link rel="stylesheet" href="{{ asset('css/default.css') }}">
+    
+</head>
+<body>
+
+    <nav class="navbar">                                                                        
+        <div class="nav-links">
+            <a href="#">Spacery</a>
+        </div>
+        <div class="nav-links">
+            <a href="#">Zarządzanie Wolontariuszami</a>
+        </div>
+        <div class="nav-links">
+            <a href="#">Zarządzanie Pracownikami</a>
+        </div>
+        <div class="nav-links">
+            <a href="#">Zarządzanie Psami</a>
+        </div>
+        <div class="nav-links">
+            <a href="#">Profil</a>
+        </div>
+    </nav>
+
+    <main class="main-content">                                                                 
+        
+        {{ $slot }}
+
+    </main>
+
+</body>
+</html>
