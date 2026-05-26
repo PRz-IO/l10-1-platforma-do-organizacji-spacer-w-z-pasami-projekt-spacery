@@ -14,7 +14,9 @@ class Account extends Model
         'Last_Name',
         'Login',
         'Password',
-        'Acc_State'
+        'Acc_State',
+        'Email',
+        'Phone_Num'
     ];
     public function worker():HasOne
     {

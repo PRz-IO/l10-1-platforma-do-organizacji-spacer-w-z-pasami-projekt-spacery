@@ -8,6 +8,8 @@ class ProfileDTO
     protected string $Last_Name;
     protected string $Login;
     protected string $Creation_Date;
+    protected string $Email;
+    protected string $Phone_Num;
     protected array $History;
     /*
     public function __construct(
@@ -56,5 +58,19 @@ class ProfileDTO
     }
     public function setHistory(array $History){
         $this->History = $History;
+    }
+
+    public function getEmail():string{
+        return $this->Email;
+    }
+    public function setEmail(string $Email){
+        $this->Login = $Email;
+    }
+
+    public function getPhone_Num():string{
+        return $this->Phone_Num;
+    }
+    public function setPhone_Num(string $Phone_Num){
+        $this->Login = $Phone_Num;
     }
 }
