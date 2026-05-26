@@ -1,16 +1,15 @@
-/* RESET I PODSTAWOWE STYLE */
+
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: Arial, sans-serif; background: #f4f6f9; color: #333; }
 
-        /* NAWIGACJA                        */
         .navbar {
-            display: flex;                  /* Układa elementy (linki) obok siebie w rzędzie */
-            justify-content: space-between; /* Spycha linki na lewo, a przycisk logowania na prawo */
-            align-items: center;            /* Wyrównuje tekst idealnie w pionie */
-            background-color: white;        /* Białe tło paska */
-            border: 3px solid black;        /* Gruba czarna ramka z makiety kolegi */
-            padding: 10px 20px;             /* Wewnętrzne odstępy (góra/dół, lewo/prawo) */
-            width: 100%;                    /* Rozciągnięcie na całą szerokość ekranu */
+            display: flex;                 
+            justify-content: space-between; 
+            align-items: center;           
+            background-color: white;       
+            border: 3px solid black;       
+            padding: 10px 20px;            
+            width: 100%;                  
         }
 
         .nav-links {
@@ -26,8 +25,8 @@
         }
         /* GŁÓWNA TREŚĆ STRONY */
         .main-content {
-            max-width: 600px;               /* Ogranicza szerokość formularza i listy */
-            margin: 30px auto;              /* Centruje cały blok na środku ekranu (auto) */
+            max-width: 600px;              
+            margin: 30px auto;            
             padding: 0 20px;
         }
 
@@ -36,7 +35,7 @@
             padding: 20px;                
             border-radius: 8px;             
             box-shadow: 0 2px 4px rgba(0,0,0,0.1); 
-            margin-bottom: 20px;            /* Odpychanie elepentów znajdujących się pod spodem */
+            margin-bottom: 20px;           
         }
 
         h2 { border-bottom: 2px solid #eee; padding-bottom: 10px; margin-bottom: 15px; }
