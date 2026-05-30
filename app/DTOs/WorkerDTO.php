@@ -40,7 +40,7 @@ final readonly class WorkerDTO
             'Name' => $this->name,
             'Last_Name' => $this->lastName,
             'Login' => $this->login,
-            'Password' => brcypt($this->password),
+            'Password' => bcrypt($this->password),
             'Acc_State' => $this->accState
         ];
     }
