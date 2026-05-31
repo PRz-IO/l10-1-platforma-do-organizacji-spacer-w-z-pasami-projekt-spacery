@@ -29,3 +29,7 @@ Route::prefix('worker')->name('worker.')->group(function () {
     Route::post('volunteers/{id}/rate', [VolunteerManagementController::class, 'storeRating'])->name('volunteers.rate');
     Route::patch('schedules/{id}/rate', [VolunteerManagementController::class, 'rateSchedule'])->name('schedules.rate');
 });
+
+Route::get('/walks-panel', function () {
+    return view('walks');
+});
