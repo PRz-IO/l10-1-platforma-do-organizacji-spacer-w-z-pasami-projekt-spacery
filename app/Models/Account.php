@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 class Account extends Model
 {
     protected $table = 'accounts';
-    protected $primaryKey = 'Id'; 
+    protected $primaryKey = 'id'; 
 
     protected $fillable =[
         'Name',

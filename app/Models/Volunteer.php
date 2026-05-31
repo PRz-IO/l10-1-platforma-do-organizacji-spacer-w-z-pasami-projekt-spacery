@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Volunteer extends Model
 {
     protected $table = 'Volunteers';
-    protected $primaryKey = 'Id';    
+    protected $primaryKey = 'id';    
 
     protected $fillable =[
         'Account_Id',
