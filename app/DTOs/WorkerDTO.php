@@ -28,7 +28,7 @@ final readonly class WorkerDTO
             password: $data['Password'],
             accState: $data['Acc_State'] ?? 'Active',
             email: $data['Email'],
-            phone_num: $data['Phone_num'],
+            phone_num: $data['Phone_Num'],
             isAdmin: (bool) ($data['Is_Admin'] ?? false)
         );
     }
@@ -47,7 +47,7 @@ final readonly class WorkerDTO
             'Password' => bcrypt($this->password),
             'Acc_State' => $this->accState,
             'Email' => $this->email,
-            'Phone_num' => $this->phone_num
+            'Phone_Num' => $this->phone_num
         ];
     }
 

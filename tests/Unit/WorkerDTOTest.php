@@ -15,7 +15,7 @@ class WorkerDTOTest extends TestCase
             'Login' => 'johnimpact',
             'Password' => 'verypassword',
             'Email' => 'JImpact@czesc.pl',
-            'Phone_num' => '123456789',
+            'Phone_Num' => '123456789',
             'Is_Admin' => true
         ];
 
@@ -49,7 +49,7 @@ class WorkerDTOTest extends TestCase
         $this->assertArrayHasKey('Login', $accountArray);
         $this->assertArrayHasKey('Password', $accountArray);
         $this->assertArrayHasKey('Email', $accountArray);
-        $this->assertArrayHasKey('Phone_num', $accountArray);
+        $this->assertArrayHasKey('Phone_Num', $accountArray);
     }
 
 
