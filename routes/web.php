@@ -9,3 +9,7 @@ Route::get('/', function () {
 Route::get('/test', function () {
     return view('test');
 });
+
+Route::get('/walks-panel', function () {
+    return view('walks');
+});
