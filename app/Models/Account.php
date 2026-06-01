@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 class Account extends Model
 {
     protected $table = 'accounts';
-    protected $primaryKey = 'id'; 
+    protected $primaryKey = 'id';
 
     protected $fillable =[
         'Name',
@@ -25,11 +25,11 @@ class Account extends Model
 
     public function worker(): HasOne
     {
-        return $this->hasOne(Worker::class, 'Account_Id', 'Id');
+        return $this->hasOne(Worker::class, 'account_id', 'id');
     }
 
     public function volunteer(): HasOne
     {
-        return $this->hasOne(Volunteer::class, 'Account_Id', 'Id');
+        return $this->hasOne(Volunteer::class, 'account_id', 'id');
     }
 }

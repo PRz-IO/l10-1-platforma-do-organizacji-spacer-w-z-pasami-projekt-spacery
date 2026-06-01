@@ -13,6 +13,6 @@ Route::get('/test', function () {
 
 Route::prefix('worker')->name('worker.')->group(function () {
     Route::resource('volunteers', VolunteerManagementController::class);
-    Route::patch('volunteers/{id}/approve', [VolunteerManagementController::class, 'approve'])->name('volunteers.approve');
-    Route::patch('volunteers/{id}/block', [VolunteerManagementController::class, 'block'])->name('volunteers.block');
+    Route::patch('volunteers/{volunteer}/approve', [VolunteerManagementController::class, 'approve'])->name('volunteers.approve');
+    Route::patch('volunteers/{volunteer}/block', [VolunteerManagementController::class, 'block'])->name('volunteers.block');
 });

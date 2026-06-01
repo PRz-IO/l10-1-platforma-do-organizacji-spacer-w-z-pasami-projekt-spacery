@@ -10,26 +10,26 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 #[WithoutTimestamps]
 class Volunteer extends Model
 {
-    protected $table = 'Volunteers';
+    protected $table = 'volunteers'; 
     protected $primaryKey = 'id';    
 
     protected $fillable =[
-        'Account_Id',
+        'account_id',
         'Is_Experienced'
     ];
 
     public function account(): BelongsTo
     {
-        return $this->belongsTo(Account::class, 'Account_Id', 'Id');
+        return $this->belongsTo(Account::class, 'account_id', 'id');
     }
 
     public function fav_dogs(): HasMany
     {
-        return $this->hasMany(Fav_Dog::class, 'Volunteer_Id', 'Id');
+        return $this->hasMany(Fav_Dog::class, 'volunteer_id', 'id');
     }
 
     public function schedules(): HasMany
     {
-        return $this->hasMany(Schedule::class, 'Volunteer_Id', 'Id');
+        return $this->hasMany(Schedule::class, 'volunteer_id', 'id');
     }
 }

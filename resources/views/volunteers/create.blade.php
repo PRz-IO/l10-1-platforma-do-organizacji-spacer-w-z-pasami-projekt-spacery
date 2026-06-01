@@ -4,7 +4,7 @@
     <div class="container" style="max-width: 600px; margin: 40px auto;">
         <h3 style="margin-bottom: 25px; font-weight: bold; color: #333;">Dodaj nowego wolontariusza do bazy</h3>
 
-        <form action="{{ route('worker.volunteers.store') }}" method="POST">
+        <form action="{{ route('worker.volunteers.store') }}" method="POST" id="registerForm">
             @csrf
 
             <div class="form-group" style="margin-bottom: 15px;">
@@ -42,6 +42,7 @@
             <div class="form-group" style="margin-bottom: 15px;">
                 <label for="Password_confirmation" style="display: block; font-weight: bold; margin-bottom: 5px; color: #444;">Powtórz hasło:</label>
                 <input type="password" name="Password_confirmation" id="Password_confirmation" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;" required>
+                <span id="passwordMatchMessage" style="font-size: 14px; display: block; margin-top: 5px;"></span>
             </div>
 
             <div class="form-group" style="margin-bottom: 15px;">
@@ -68,9 +69,45 @@
             </div>
 
             <div style="display: flex; gap: 12px; align-items: center;">
-                <button type="submit" style="background-color: #007bff; color: white; padding: 10px 24px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 15px;">Zapisz w bazie</button>
+                <button type="submit" id="submitBtn" style="background-color: #007bff; color: white; padding: 10px 24px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 15px;">Zapisz w bazie</button>
                 <a href="{{ route('worker.volunteers.index') }}" style="color: #6c757d; text-decoration: none; padding: 10px 20px; border: 1px solid #ccc; border-radius: 4px; font-weight: bold; font-size: 15px; background: transparent;">Anuluj</a>
             </div>
         </form>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const password = document.getElementById('Password');
+            const confirmPassword = document.getElementById('Password_confirmation');
+            const message = document.getElementById('passwordMatchMessage');
+            const submitBtn = document.getElementById('submitBtn');
+
+            function validatePasswords() {
+                if (confirmPassword.value.length === 0) {
+                    message.textContent = '';
+                    submitBtn.disabled = false;
+                    submitBtn.style.backgroundColor = '#007bff';
+                    submitBtn.style.cursor = 'pointer';
+                    return;
+                }
+
+                if (password.value === confirmPassword.value) {
+                    message.textContent = 'Hasła są identyczne.';
+                    message.style.color = '#28a745';
+                    submitBtn.disabled = false;
+                    submitBtn.style.backgroundColor = '#007bff';
+                    submitBtn.style.cursor = 'pointer';
+                } else {
+                    message.textContent = 'Hasła nie pasują do siebie!';
+                    message.style.color = '#f44336';
+                    submitBtn.disabled = true;
+                    submitBtn.style.backgroundColor = '#cccccc';
+                    submitBtn.style.cursor = 'not-allowed';
+                }
+            }
+
+            password.addEventListener('input', validatePasswords);
+            confirmPassword.addEventListener('input', validatePasswords);
+        });
+    </script>
 </x-layout>
