@@ -13,7 +13,12 @@
             <a href="#">Spacery</a>
         </div>
         <div class="nav-links">
-            <a href="#">Zarządzanie Wolontariuszami</a>
+            @if (\App\Utilities\CurrUser::IsLogged() && \App\Utilities\CurrUser::getRole()=="Worker")
+                <a href="{{ route('worker.volunteers.index') }}">Zarządzanie Wolontariuszami</a>    
+            @else
+                <a href="#" class="nav-dummy">Zarządzanie Wolontariuszami</a>
+            @endif
+            
         </div>
         <div class="nav-links">
             <a href="#">Zarządzanie Pracownikami</a>
@@ -43,7 +48,7 @@
     </nav>
 
     <main class="main-content">                                                                 
-        
+
         {{ $slot }}
 
     </main>

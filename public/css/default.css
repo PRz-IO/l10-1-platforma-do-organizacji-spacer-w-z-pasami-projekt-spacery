@@ -17,12 +17,17 @@
             gap: 40px;                      
             list-style: none;               
         }
-
+        .nav-links .nav-dummy{
+            text-decoration: none; 
+            color: gray;                   
+            font-size: 18px; 
+        }
         .nav-links a {
             text-decoration: none;          
             color: black;                   
             font-size: 18px;                
         }
+        
         /* GŁÓWNA TREŚĆ STRONY */
         .main-content {
             max-width: 600px;              
