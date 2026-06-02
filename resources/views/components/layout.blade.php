@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <title>{{ isset($title) ? $title : 'Test'}}</title>
     <link rel="stylesheet" href="{{ asset('css/default.css') }}">
-    
+    @stack('styles')
 </head>
 <body>
 
@@ -22,7 +22,23 @@
             <a href="#">Zarządzanie Psami</a>
         </div>
         <div class="nav-links">
+
+            @if (\App\Utilities\CurrUser::IsLogged())
+            <div class="nav-links">    
             <a href="#">Profil</a>
+            </div>
+            <div class="nav-links">    
+            <a href="{{ route('login.logout') }}">Wyloguj</a>
+            </div>
+            @else
+            <div class="nav-links">    
+            <a href="{{ route('login.login') }}">Zaloguj</a>
+            </div>
+            <div class="nav-links">    
+            <a href="#">Zarejestruj</a>
+            </div>
+            @endif
+            
         </div>
     </nav>
 

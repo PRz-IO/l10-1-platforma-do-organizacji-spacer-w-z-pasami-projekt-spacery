@@ -6,22 +6,25 @@ use App\DTOs\CurrentUserDTO;
 
 class CurrUser
 {
-    private static int $Id;
-    private static string $Role;
-    private static bool $Param;
-    private static string $Acc_State;
-
     public static function set(CurrentUserDTO $curr):void{
-        CurrUser::$Id = $curr->getId();
-        CurrUser::$Role = $curr->getRole();
-        CurrUser::$Param = $curr->getParam();
-        CurrUser::$Acc_State = $curr->getAcc_State();
+        session(['Id'=>$curr->getId()]);
+        session(['Role'=>$curr->getRole()]);
+        session(['Param'=>$curr->getParam()]);
+        session(['AccState'=>$curr->getAcc_State()]);
+        session(['IsLogged'=>True]);
         return;
     }
-
+    public static function LogOut():void{
+        session()->forget(['Id','Role','Param','AccState']);
+        session(['IsLogged'=>False]);
+        return;
+    }
+    public static function IsLogged():bool{
+        return session('IsLogged',False);
+    }
     public static function getId():int{
-        if(isset(CurrUser::$Id)){
-            return CurrUser::$Id;
+        if(session()->has("Id")){
+            return session("Id");
         }
         else{
             throw new \Exception("There is no Id set");
@@ -29,8 +32,8 @@ class CurrUser
     }
 
     public static function getRole():string{
-        if(isset(CurrUser::$Role)){
-            return CurrUser::$Role;
+        if(session()->has("Role")){
+            return session("Role");
         }
         else{
             throw new \Exception("There is no Role set");
@@ -38,8 +41,8 @@ class CurrUser
     }
 
     public static function getParam():bool{
-        if(isset(CurrUser::$Param)){
-            return CurrUser::$Param;
+        if(session()->has("Param")){
+            return session('Param');
         }
         else{
             throw new \Exception("There is no Param set");
@@ -47,8 +50,8 @@ class CurrUser
     }
 
     public static function getAcc_State():string{
-        if(isset(CurrUser::$Acc_State)){
-            return CurrUser::$Acc_State;
+        if(session()->has('AccState')){
+            return session('AccState');
         }
         else{
             throw new \Exception("There is no Acc_State set");
