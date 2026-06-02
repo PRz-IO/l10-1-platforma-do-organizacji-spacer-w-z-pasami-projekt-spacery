@@ -1,15 +1,18 @@
 <x-layout>
     @push('styles')
+        <link rel="stylesheet" href="{{ asset('css/signup.css') }}">
         <link rel="stylesheet" href="{{ asset('css/login.css') }}">
     @endpush
     <div class="container">
         <h3>Logowanie</h3><br><br>
-        <form action="{{ route('login.login') }}" method="post">
+        <form action="{{ route('signup.signup') }}" method="post">
             @csrf
             <label for="login">Login:</label>
-            <input type="text" class="LogInp" id="login" name="login" @isset($L)
+            <input type="text" class="LogInp" id="login" name="login" 
+            @isset($L)
                 value="{{ $L }}"
-            @endisset><br><br>
+            @endisset
+            ><br><br>
             <label for="password">Hasło:</label>
             <input type="password" class="LogInp" id="password" name="password"><br><br>
             <button type="submit" class="LogBtn">Zaloguj</button>

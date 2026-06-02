@@ -4,8 +4,8 @@ namespace App\Http\Controllers;
 
 use App\DTOs\CurrentUserDTO;
 use App\Utilities\CurrUser;
-use Dotenv\Exception\ValidationException;
 use Exception;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\Request;
 use App\Models\Account;
 
@@ -33,6 +33,7 @@ class LoginController extends Controller
             return view('LogIn')->with('L',$L)->with('Err','Nie podano loginu lub hasła');
         }
 
+        //$acc = Account::where('Login',$L)->where('Password',Hash::make($request->input('password')))->first();
         $acc = Account::where('Login',$L)->where('Password',$request->input('password'))->first();
         if(is_null($acc)){
             return view('LogIn')->with('L',$L)->with('Err','Błędne dane logowania');

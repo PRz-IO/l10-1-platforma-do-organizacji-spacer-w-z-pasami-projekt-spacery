@@ -40,7 +40,7 @@
             <a href="{{ route('login.login') }}">Zaloguj</a>
             </div>
             <div class="nav-links">    
-            <a href="#">Zarejestruj</a>
+            <a href="{{ route('signup.index') }}">Zarejestruj</a>
             </div>
             @endif
             

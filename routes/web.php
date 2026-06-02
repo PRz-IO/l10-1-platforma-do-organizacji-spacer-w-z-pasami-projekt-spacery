@@ -1,11 +1,12 @@
 <?php
 
 use App\Http\Controllers\LoginController;
+use App\Http\Controllers\SignupController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\VolunteerManagementController;
 
 Route::get('/', function () {
-    return redirect("/login");
+    return redirect("/test");
     //return view('welcome');
 });
 
@@ -14,6 +15,12 @@ Route::controller(LoginController::class)->group(function () {
     Route::get("/login", 'index')->name('login.index');
     Route::post("/login", 'Login')->name('login.login');
     Route::get("/logout", 'Logout')->name('login.logout');
+});
+
+Route::controller(SignupController::class)->group(function () {
+    Route::get("/signup", 'index')->name('signup.index');
+    Route::post("/signup", 'SignUp')->name('signup.signup');
+    //Route::get("/logout", 'Logout')->name('login.logout');
 });
 
 
