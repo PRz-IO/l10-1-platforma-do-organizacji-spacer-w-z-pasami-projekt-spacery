@@ -13,38 +13,49 @@
             <a href="{{ route('walks.index') }}">Spacery</a>
         </div>
         <div class="nav-links">
-            @if (\App\Utilities\CurrUser::IsLogged() && \App\Utilities\CurrUser::getRole()=="Worker")
-                <a href="{{ route('worker.volunteers.index') }}">Zarządzanie Wolontariuszami</a>    
+            <a
+            @if (\App\Utilities\CurrUser::IsLogged() && 
+            \App\Utilities\CurrUser::getRole()=="Worker" &&
+            \App\Utilities\CurrUser::getAcc_State() !="Pending")
+                 href="{{ route('worker.volunteers.index') }}"    
             @else
-                <a href="#" class="nav-dummy">Zarządzanie Wolontariuszami</a>
+                href="#" class="nav-dummy"
             @endif
-            
+            >Zarządzanie Wolontariuszami</a>
         </div>
         <div class="nav-links">
-            <a href="#">Zarządzanie Pracownikami</a>
+            <a 
+            @if (\App\Utilities\CurrUser::IsLogged() && 
+            \App\Utilities\CurrUser::getRole()=="Worker" &&
+            \App\Utilities\CurrUser::getAcc_State() !="Pending" &&
+            \App\Utilities\CurrUser::getParam() ==True)
+                 href="{{ '#' }}"    
+            @else
+                href="#" class="nav-dummy"
+            @endif
+            >Zarządzanie Pracownikami</a>
         </div>
         <div class="nav-links">
-            <a href="#">Zarządzanie Psami</a>
+            <a href="{{ route('dogs.index') }}" >Psy</a>
         </div>
-        <div class="nav-links">
+       
 
-            @if (\App\Utilities\CurrUser::IsLogged())
-            <div class="nav-links">    
-            <a href="#">Profil</a>
-            </div>
-            <div class="nav-links">    
-            <a href="{{ route('login.logout') }}">Wyloguj</a>
-            </div>
-            @else
-            <div class="nav-links">    
-            <a href="{{ route('login.login') }}">Zaloguj</a>
-            </div>
-            <div class="nav-links">    
-            <a href="#">Zarejestruj</a>
-            </div>
-            @endif
-            
+        @if (\App\Utilities\CurrUser::IsLogged())
+        <div class="nav-links">    
+        <a href="#">Profil</a>
         </div>
+        <div class="nav-links">    
+        <a href="{{ route('login.logout') }}">Wyloguj</a>
+        </div>
+        @else
+        <div class="nav-links">    
+        <a href="{{ route('login.login') }}">Zaloguj</a>
+        </div>
+        <div class="nav-links">    
+        <a href="{{ route('signup.index') }}">Zarejestruj</a>
+        </div>
+        @endif
+
     </nav>
 
     <main class="main-content">                                                                 
