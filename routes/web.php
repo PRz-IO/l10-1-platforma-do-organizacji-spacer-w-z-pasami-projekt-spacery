@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\LoginController;
+use App\Http\Controllers\SignupController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\VolunteerManagementController;
 
@@ -8,7 +9,7 @@ use App\Http\Controllers\DogsController;
 use App\Http\Controllers\FavDogsController;
 
 Route::get('/', function () {
-    return redirect("/login");
+    return redirect("/test");
     //return view('welcome');
 });
 
@@ -19,13 +20,18 @@ Route::controller(LoginController::class)->group(function () {
     Route::get("/logout", 'Logout')->name('login.logout');
 });
 
-
-Route::get('/test', function () {
-    return view('test');
+Route::controller(SignupController::class)->group(function () {
+    Route::get("/signup", 'index')->name('signup.index');
+    Route::post("/signup", 'SignUp')->name('signup.signup');
 });
 
 
-Route::get('/dogs', [DogsController::class, 'index']);
+Route::get('/test', function () {
+    return view('test');
+})->name('test');
+
+
+Route::get('/dogs', [DogsController::class, 'index'])->name('dogs.index');
 Route::get('/dogs/create', [DogsController::class, 'create']);
 Route::post('/dogs', [DogsController::class, 'store']);
 Route::get('/dogs/{id}', [DogsController::class, 'show']);
