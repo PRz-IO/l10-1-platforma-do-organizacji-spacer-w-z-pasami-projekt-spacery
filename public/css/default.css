@@ -4,29 +4,38 @@
         body { font-family: Arial, sans-serif; background: #f4f6f9; color: #333; min-height: 100vh; margin: 0px; padding: 0px;}
 
         .navbar {
-            display: flex;                 
-            justify-content: space-between; 
-            align-items: center;           
+            display:flex;         
+            flex-wrap: wrap;
+            justify-content: space-around;
             background-color: white;       
             border: 3px solid black;       
-            padding: 10px 20px;            
-            width: 100%;                  
+            
+            width: 100%;     
+            overflow: hidden;  
+            min-width: none;   
+            min-height: none;   
         }
 
         .nav-links {
-            display: flex;                  
+            display: block;                  
             gap: 40px;                      
-            list-style: none;               
+            list-style: none;
+            height: 100%;
+            padding: 10px 20px;  
+            float: left;
+            /*width: calc(100%/6);*/
+            width: auto;
         }
         .nav-links .nav-dummy{
             text-decoration: none; 
             color: gray;                   
-            font-size: 18px; 
+            font-size: 100%; 
         }
         .nav-links a {
             text-decoration: none;          
             color: black;                   
-            font-size: 18px;                
+            font-size: 100%;  
+              
         }
         
         /* GŁÓWNA TREŚĆ STRONY */
@@ -34,15 +43,17 @@
             min-height: 100vh;
             width: 100%;            
             padding: 30px 20px;
-            background-image: url("../images/h1.jpg");
+            /*
+            background-image: url("");
             background-repeat: no-repeat;
             background-size: 100% 100%;
+            */
         }
 
         .container { 
             max-width: 600px;
             background: white; 
-            width: 40vw;   
+            width: 60vw;   
             margin: 0px auto;  
             padding: 20px;                
             border-radius: 8px;             

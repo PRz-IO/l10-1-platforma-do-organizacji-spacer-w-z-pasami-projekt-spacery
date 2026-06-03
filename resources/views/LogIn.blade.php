@@ -15,7 +15,7 @@
             <button type="submit" class="LogBtn">Zaloguj</button>
         </form>
         <br>
-        <form action="/signup">
+        <form action="{{ route('signup.index') }}">
         <button type="submit" class="LogBtn">Rejestracja</button>
         </form>
         <br><br><br>

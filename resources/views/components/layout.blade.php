@@ -13,7 +13,9 @@
             <a href="#">Spacery</a>
         </div>
         <div class="nav-links">
-            @if (\App\Utilities\CurrUser::IsLogged() && \App\Utilities\CurrUser::getRole()=="Worker")
+            @if (\App\Utilities\CurrUser::IsLogged() && 
+            \App\Utilities\CurrUser::getRole()=="Worker" &&
+            \App\Utilities\CurrUser::getAcc_State() !="Pending")
                 <a href="{{ route('worker.volunteers.index') }}">Zarządzanie Wolontariuszami</a>    
             @else
                 <a href="#" class="nav-dummy">Zarządzanie Wolontariuszami</a>
@@ -26,25 +28,24 @@
         <div class="nav-links">
             <a href="#">Zarządzanie Psami</a>
         </div>
-        <div class="nav-links">
+       
 
-            @if (\App\Utilities\CurrUser::IsLogged())
-            <div class="nav-links">    
-            <a href="#">Profil</a>
-            </div>
-            <div class="nav-links">    
-            <a href="{{ route('login.logout') }}">Wyloguj</a>
-            </div>
-            @else
-            <div class="nav-links">    
-            <a href="{{ route('login.login') }}">Zaloguj</a>
-            </div>
-            <div class="nav-links">    
-            <a href="{{ route('signup.index') }}">Zarejestruj</a>
-            </div>
-            @endif
-            
+        @if (\App\Utilities\CurrUser::IsLogged())
+        <div class="nav-links">    
+        <a href="#">Profil</a>
         </div>
+        <div class="nav-links">    
+        <a href="{{ route('login.logout') }}">Wyloguj</a>
+        </div>
+        @else
+        <div class="nav-links">    
+        <a href="{{ route('login.login') }}">Zaloguj</a>
+        </div>
+        <div class="nav-links">    
+        <a href="{{ route('signup.index') }}">Zarejestruj</a>
+        </div>
+        @endif
+
     </nav>
 
     <main class="main-content">                                                                 

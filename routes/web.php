@@ -26,7 +26,7 @@ Route::controller(SignupController::class)->group(function () {
 
 Route::get('/test', function () {
     return view('test');
-});
+})->name('test');
 
 Route::prefix('worker')->name('worker.')->group(function () {
     Route::resource('volunteers', VolunteerManagementController::class);
