@@ -8,14 +8,31 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use App\Models\Schedule;
 
 class VolunteerManagementController extends Controller
 {
-    public function index()
-    {
-        $volunteers = Volunteer::with('account')->get();
-        return view('volunteers.index', compact('volunteers'));
+    public function index(Request $request)
+{
+    // Pobieramy frazę wpisaną w wyszukiwarkę
+    $search = $request->input('search');
+
+    // Budujemy bazowe zapytanie
+    $query = Volunteer::with('account')
+        ->withAvg('schedules as average_rating', 'Grade');
+    
+        if (!empty($search)) {
+        $query->whereHas('account', function ($q) use ($search) {
+            $q->where('Last_Name', 'like', "%{$search}%")
+              ->orWhere('Name', 'like', "%{$search}%")
+              ->orWhere('Login', 'like', "%{$search}%");
+        });
     }
+
+    $volunteers = $query->get();
+    return view('volunteers.index', compact('volunteers', 'search'));
+}
+    
 
     public function create()
     {
@@ -32,7 +49,7 @@ class VolunteerManagementController extends Controller
             'Phone_Num' => 'required',
         ]);
 
-        $randomPassword = Str::random(8);
+        $randomPassword = substr(str_shuffle('abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ123456789'), 0, 8);
 
         DB::transaction(function () use ($validated, $request, $randomPassword) {
             $account = Account::create([
@@ -53,12 +70,14 @@ class VolunteerManagementController extends Controller
         });
 
         return redirect()->route('worker.volunteers.index')
-            ->with('success', "Wolontariusz został dodany! Hasło startowe: {$randomPassword}");
+        ->with('success', "Wolontariusz został dodany! Hasło startowe: <strong style='font-family: Consolas, Courier New, monospace; font-size: 16px; background: #fff; padding: 4px 8px; border: 1px solid #ced4da; border-radius: 4px; letter-spacing: 2px; color: #dc3545;'>{$randomPassword}</strong>");
     }
 
     public function show($id)
     {
-        $volunteer = Volunteer::with(['account', 'schedules.dog'])->findOrFail($id);
+        $volunteer = Volunteer::with(['account', 'schedules.dog'])
+            ->withAvg('schedules as average_rating', 'Grade')
+            ->findOrFail($id);
         return view('volunteers.show', compact('volunteer'));
     }
 
@@ -158,10 +177,25 @@ class VolunteerManagementController extends Controller
             return redirect()->route('worker.volunteers.index')->with('error', 'Nie znaleziono powiązanego konta.');
         }
 
-        $newPassword = Str::random(8);
+        $newPassword = substr(str_shuffle('abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789'), 0, 8);
         $volunteer->account->update(['Password' => Hash::make($newPassword)]);
 
         return redirect()->route('worker.volunteers.index')
-            ->with('success', "Hasło dla wolontariusza zostało zresetowane na: <strong>{$newPassword}</strong>");
+        ->with('success', "Hasło dla wolontariusza zostało zresetowane na: <strong style='font-family: Consolas, Courier New, monospace; font-size: 16px; background: #fff; padding: 4px 8px; border: 1px solid #ced4da; border-radius: 4px; letter-spacing: 2px; color: #dc3545;'>{$newPassword}</strong>");
+    }
+    public function rateSchedule(Request $request, $id)
+    {
+        $validated = $request->validate([
+            'Grade' => 'required|integer|between:1,5',
+            'Note' => 'nullable|string|max:1000',
+        ]);
+
+        $schedule = Schedule::findOrFail($id);
+        $schedule->update([
+            'Grade' => $validated['Grade'],
+            'Note' => $validated['Note'],
+        ]);
+
+        return back()->with('success', 'Ocena oraz uwagi ze spaceru zostały pomyślnie zapisane!');
     }
 }

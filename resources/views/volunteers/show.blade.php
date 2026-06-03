@@ -3,25 +3,22 @@
 
     <div class="container" style="max-width: 900px; margin: 40px auto; padding: 20px; font-family: sans-serif;">
         
-        {{-- SPECJALNA CZERWONA RAMKA NA WYŚWIETLANIE WYGENEROWANEGO HASŁA --}}
         @if(session('generated_password'))
             <div style="padding: 20px; background-color: #fff5f5; color: #dc3545; border: 2px dashed #dc3545; border-radius: 6px; margin-bottom: 20px; font-size: 15px; text-align: center;">
                 <strong style="display: block; margin-bottom: 8px; font-size: 16px;">⚠️ Wygenerowano nowe hasło tymczasowe!</strong>
                 Użytkownik musi zmienić je przy pierwszym logowaniu. Hasło: 
-                <span style="font-family: monospace; font-size: 18px; font-weight: bold; background: white; padding: 4px 10px; border: 1px solid #dc3545; border-radius: 4px; margin-left: 5px; display: inline-block;">
+                <span style="font-family: Consolas, Courier New, monospace; font-size: 18px; font-weight: bold; background: white; padding: 4px 10px; border: 1px solid #dc3545; border-radius: 4px; margin-left: 5px; display: inline-block; letter-spacing: 2px;">
                     {{ session('generated_password') }}
                 </span>
             </div>
         @endif
 
-        {{-- Standardowe komunikaty sukcesu (zielone) --}}
         @if(session('success'))
             <div style="padding: 15px; background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; border-radius: 4px; margin-bottom: 20px; font-size: 14px;">
-                {{ session('success') }}
+                {!! session('success') !!}
             </div>
         @endif
 
-        {{-- Standardowe komunikaty błędów (czerwone, pełne) --}}
         @if(session('error'))
             <div style="padding: 15px; background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; border-radius: 4px; margin-bottom: 20px; font-size: 14px;">
                 {{ session('error') }}
@@ -30,16 +27,23 @@
 
         <h2>Pełne informacje: {{ $volunteer->account?->Name ?? 'Brak' }} {{ $volunteer->account?->Last_Name ?? 'Danych' }}</h2>
         
-        {{-- Podstawowe informacje o wolontariuszu --}}
         <div style="background: #fdfdfd; padding: 20px; margin: 20px 0; border-radius: 6px; border: 1px solid #e3e3e3; border-left: 5px solid #007bff;">
             <p style="margin: 6px 0;"><strong>Status konta w systemie:</strong> {{ $volunteer->account?->Acc_State ?? 'Pending' }}</p>
             <p style="margin: 6px 0;"><strong>Adres Email:</strong> {{ $volunteer->account?->Email ?? '---' }}</p>
             <p style="margin: 6px 0;"><strong>Numer Telefonu:</strong> {{ $volunteer->account?->Phone_Num ?? '---' }}</p>
             <p style="margin: 6px 0;"><strong>Data rejestracji konta:</strong> {{ $volunteer->account?->Creation_Date ?? '---' }}</p>
             <p style="margin: 6px 0;"><strong>Kwalifikacje:</strong> {{ $volunteer->Is_Experienced ? 'Doświadczony wolontariusz (Samodzielny)' : 'Brak doświadczenia (Wymaga asysty)' }}</p>
+            <p style="margin: 6px 0;"><strong>Ogólna ocena wolontariusza:</strong> 
+                @if($volunteer->average_rating)
+                    <span style="color: #ffc107; font-weight: bold; background: #fff9e6; padding: 2px 6px; border-radius: 4px; border: 1px solid #ffeeba;">
+                        ★ {{ number_format($volunteer->average_rating, 2) }} / 5
+                    </span>
+                @else
+                    <span style="color: #888; font-style: italic;">Brak ocen</span>
+                @endif
+            </p>
         </div>
 
-        {{-- Panel Akcji Pracownika --}}
         <div style="background: #f8f9fa; padding: 20px; border-radius: 6px; border: 1px solid #e3e3e3; margin: 20px 0;">
             <h3 style="margin-top: 0; margin-bottom: 15px; color: #333; font-size: 16px;">Panel zarządzania kontem (Pracownik)</h3>
             <div style="display: flex; gap: 10px; flex-wrap: wrap;">
@@ -77,7 +81,6 @@
             </div>
         </div>
 
-        {{-- Historia spacerów z formularzem oceniania --}}
         <h3 style="margin-top: 30px; border-bottom: 2px solid #eee; padding-bottom: 10px;">Historia i Grafik Spacerów</h3>
         
         @if($volunteer->schedules->isEmpty())

@@ -16,8 +16,27 @@
             </a>
         </div>
 
+        <form action="{{ route('worker.volunteers.index') }}" method="GET" style="margin-bottom: 25px; display: flex; gap: 10px;">
+            <input type="text" name="search" value="{{ $search ?? '' }}" placeholder="Wpisz nazwisko, imię lub login wolontariusza..." 
+                   style="flex: 1; padding: 10px 15px; border: 1px solid #ced4da; border-radius: 4px; font-size: 14px; box-sizing: border-box;">
+            
+            <button type="submit" style="width: auto; padding: 10px 20px; background: #28a745; color: white; border: none; border-radius: 4px; font-weight: bold; font-size: 14px; cursor: pointer;">
+                Szukaj
+            </button>
+
+            @if(!empty($search))
+                <a href="{{ route('worker.volunteers.index') }}" style="text-decoration: none; box-sizing: border-box;">
+                    <span style="display: inline-block; padding: 10px 20px; background: #6c757d; color: white; border-radius: 4px; font-weight: bold; font-size: 14px; text-align: center; cursor: pointer;">
+                        Wyczyść
+                    </span>
+                </a>
+            @endif
+        </form>
+
         @if($volunteers->isEmpty())
-            <p style="color: #666; text-align: center; margin-top: 30px;">Brak zarejestrowanych wolontariuszy w bazie danych.</p>
+            <p style="color: #666; text-align: center; margin-top: 30px;">
+                {{ !empty($search) ? 'Brak wyników spełniających kryteria wyszukiwania.' : 'Brak zarejestrowanych wolontariuszy w bazie danych.' }}
+            </p>
         @else
             <ul style="padding: 0; margin: 0;">
                 @foreach($volunteers as $volunteer)
@@ -48,7 +67,15 @@
                                     <strong>Doświadczenie:</strong> 
                                     <span style="font-weight: bold; color: {{ $volunteer->Is_Experienced ? '#28a745' : '#6c757d' }};">
                                         {{ $volunteer->Is_Experienced ? 'Tak' : 'Nie' }}
-                                    </span>
+                                    </span> <br>
+                                    <strong>Ogólna ocena:</strong> 
+                                    @if($volunteer->average_rating)
+                                        <span style="color: #ffc107; font-weight: bold;">
+                                            ★ {{ number_format($volunteer->average_rating, 2) }} / 5
+                                        </span>
+                                    @else
+                                        <span style="color: #888; font-style: italic;">Brak ocen</span>
+                                    @endif
                                 </div>
                             </div>
                             
@@ -63,7 +90,6 @@
                                         <span style="background: #6c757d; color: white; display: inline-block; padding: 6px 12px; font-size: 13px; border-radius: 4px; font-weight: 500; cursor: pointer;">Edytuj</span>
                                     </a>
 
-                                    {{-- Przycisk Resetowania Hasła --}}
                                     <form action="{{ route('worker.volunteers.reset-password', $volunteer->id) }}" method="POST" style="margin: 0; display: inline;" onsubmit="return confirm('Czy na pewno chcesz zresetować hasło temu wolontariuszowi na losowe?')">
                                         @csrf
                                         @method('PATCH')
