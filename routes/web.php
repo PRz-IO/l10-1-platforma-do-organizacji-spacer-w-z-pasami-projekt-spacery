@@ -2,6 +2,10 @@
 
 use App\Http\Controllers\LoginController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\WorkersController;
+
+Route::view('/layout-test', 'components.layout');
+Route::resource('workers', WorkersController::class);
 use App\Http\Controllers\VolunteerManagementController;
 
 Route::get('/', function () {

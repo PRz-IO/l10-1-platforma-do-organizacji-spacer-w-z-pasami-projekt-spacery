@@ -18,10 +18,13 @@
             @else
                 <a href="#" class="nav-dummy">Zarządzanie Wolontariuszami</a>
             @endif
-            
+        <!-- 
+            TO DO:
+            Only workers should be able to access it
+        -->
         </div>
         <div class="nav-links">
-            <a href="#">Zarządzanie Pracownikami</a>
+            <a href="{{ route('workers.index') }}">Zarządzanie Pracownikami</a>
         </div>
         <div class="nav-links">
             <a href="#">Zarządzanie Psami</a>
