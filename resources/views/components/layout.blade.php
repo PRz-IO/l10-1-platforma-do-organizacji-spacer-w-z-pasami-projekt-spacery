@@ -13,20 +13,30 @@
             <a href="#">Spacery</a>
         </div>
         <div class="nav-links">
+            <a
             @if (\App\Utilities\CurrUser::IsLogged() && 
             \App\Utilities\CurrUser::getRole()=="Worker" &&
             \App\Utilities\CurrUser::getAcc_State() !="Pending")
-                <a href="{{ route('worker.volunteers.index') }}">Zarządzanie Wolontariuszami</a>    
+                 href="{{ route('worker.volunteers.index') }}"    
             @else
-                <a href="#" class="nav-dummy">Zarządzanie Wolontariuszami</a>
+                href="#" class="nav-dummy"
             @endif
-            
+            >Zarządzanie Wolontariuszami</a>
         </div>
         <div class="nav-links">
-            <a href="#">Zarządzanie Pracownikami</a>
+            <a 
+            @if (\App\Utilities\CurrUser::IsLogged() && 
+            \App\Utilities\CurrUser::getRole()=="Worker" &&
+            \App\Utilities\CurrUser::getAcc_State() !="Pending" &&
+            \App\Utilities\CurrUser::getParam() ==True)
+                 href="{{ '#' }}"    
+            @else
+                href="#" class="nav-dummy"
+            @endif
+            >Zarządzanie Pracownikami</a>
         </div>
         <div class="nav-links">
-            <a href="#">Zarządzanie Psami</a>
+            <a href="{{ route('dogs.index') }}" >Psy</a>
         </div>
        
 

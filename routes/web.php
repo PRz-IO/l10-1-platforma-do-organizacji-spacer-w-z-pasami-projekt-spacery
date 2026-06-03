@@ -23,7 +23,6 @@ Route::controller(LoginController::class)->group(function () {
 Route::controller(SignupController::class)->group(function () {
     Route::get("/signup", 'index')->name('signup.index');
     Route::post("/signup", 'SignUp')->name('signup.signup');
-    //Route::get("/logout", 'Logout')->name('login.logout');
 });
 
 
@@ -32,7 +31,7 @@ Route::get('/test', function () {
 })->name('test');
 
 
-Route::get('/dogs', [DogsController::class, 'index']);
+Route::get('/dogs', [DogsController::class, 'index'])->name('dogs.index');
 Route::get('/dogs/create', [DogsController::class, 'create']);
 Route::post('/dogs', [DogsController::class, 'store']);
 Route::get('/dogs/{id}', [DogsController::class, 'show']);
