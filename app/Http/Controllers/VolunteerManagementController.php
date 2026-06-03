@@ -14,10 +14,8 @@ class VolunteerManagementController extends Controller
 {
     public function index(Request $request)
 {
-    // Pobieramy frazę wpisaną w wyszukiwarkę
     $search = $request->input('search');
 
-    // Budujemy bazowe zapytanie
     $query = Volunteer::with('account')
         ->withAvg('schedules as average_rating', 'Grade');
     
