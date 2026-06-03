@@ -6,6 +6,8 @@ use App\Models\Dog;
 use App\Models\Schedule;
 use App\DTOs\DogDTO;
 use Illuminate\Http\Request;
+use App\Models\Fav_Dog;
+use App\Utilities\CurrUser;
 
 class DogsController extends Controller
 {
@@ -13,7 +15,15 @@ class DogsController extends Controller
     {
         $dogs = Dog::all();
 
-        return view('dogs.index', compact('dogs'));
+        $favDogIds = [];
+
+        if (CurrUser::IsLogged() && CurrUser::getRole() === 'Volunteer') {
+            $favDogIds = Fav_Dog::where('volunteer_id', CurrUser::getId())
+                ->pluck('dog_id')
+                ->toArray();
+        }
+
+        return view('dogs.index', compact('dogs', 'favDogIds'));
     }
 
     public function show($id)
@@ -60,11 +70,67 @@ class DogsController extends Controller
     }
 
     public function walks($id)
-    {
-        $walks = Schedule::where('dog_id', $id)
-            ->orderBy('Date', 'desc')
-            ->get();
+{
+    if (!\App\Utilities\CurrUser::IsLogged()) {
+        return redirect('/login');
+    }
 
-        return view('dogs.walks', compact('walks'));
+    $dog = \App\Models\Dog::findOrFail($id);
+
+    $role = \App\Utilities\CurrUser::getRole();
+    $userId = \App\Utilities\CurrUser::getId();
+
+    if ($role === 'Worker') {
+        $walks = \App\Models\Schedule::where('dog_id', $id)
+            ->orderBy('Date', 'desc')
+            ->orderBy('Time', 'desc')
+            ->get();
+    }
+
+    elseif ($role === 'Volunteer') {
+        $walks = \App\Models\Schedule::where('dog_id', $id)
+            ->where('volunteer_id', $userId)
+            ->orderBy('Date', 'desc')
+            ->orderBy('Time', 'desc')
+            ->get();
+    }
+
+    else {
+        return redirect('/dogs');
+    }
+
+    return view('dogs.walks', compact('walks', 'dog'));
+}
+
+    public function toggleFavorite($id)
+    {
+        if (!CurrUser::IsLogged()) {
+            return redirect('/login');
+        }
+
+        if (CurrUser::getRole() !== 'Volunteer') {
+            return redirect('/dogs');
+        }
+
+        $volunteerId = CurrUser::getId();
+
+        $existing = Fav_Dog::where('dog_id', $id)
+            ->where('volunteer_id', $volunteerId)
+            ->first();
+
+        if ($existing) {
+            $existing->delete();
+
+            return redirect('/dogs')
+                ->with('favorite_removed', true);
+        }
+
+        Fav_Dog::create([
+            'dog_id' => $id,
+            'volunteer_id' => $volunteerId
+        ]);
+
+        return redirect('/dogs')
+            ->with('favorite_added', true);
     }
 }
