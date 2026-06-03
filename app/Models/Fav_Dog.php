@@ -9,9 +9,14 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 #[WithoutTimestamps]
 class Fav_Dog extends Model
 {
-    protected $table ='fav_dogs';
 
-    protected $fillable = [];
+    protected $table = 'fav_dogs';
+
+
+    protected $fillable = [
+        'dog_id',
+        'volunteer_id'
+    ];
 
     public function dog():BelongsTo
     {
