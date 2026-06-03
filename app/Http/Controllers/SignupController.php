@@ -20,12 +20,12 @@ class SignupController extends Controller
             $val = $request->validate([
                 'login' => 'required|string|min:3|max:80|unique:accounts,Login',
                 'email'=> 'required|string|max:80|email:rfc,strict|unique:accounts,Email',
-                'password' => 'required|string|min:3|max:80', 
-                'rpassword'=>'required|string|min:3|max:80|same:password',
-                'name'=>'required|string|min:3|max:80',
-                'surname'=>'required|string|min:3|max:80',
-                'phone'=>['required','string','regex:/^[0-9]{9}/','unique:accounts,Phone_Num'],
-                'role'=>'required|string|max:80',
+                'password' => 'required|string|min:6|max:80', 
+                'rpassword'=>'required|string|min:6|max:80|same:password',
+                'name'=>['required','string','min:3','max:80','regex:/^[A-Z][a-zęóąśłżźćń]{2,}$/'],
+                'surname'=>['required','string','min:3','max:80','regex:/^[A-Z][a-zęóąśłżźćń]{2,}$/'],
+                'phone'=>['required','string','regex:/^[0-9]{9}$/','unique:accounts,Phone_Num'],
+                'role'=>'required|string|max:80'
             ]);
         }
         catch(Exception $e){
@@ -35,6 +35,7 @@ class SignupController extends Controller
             ->with('P',$request->input('phone'))->with('R',$request->input('role'))
             ->with('Err','Błędne dane');
         }
+        
         $Acc = Account::create([
             'Name'=>$request->input('name'),
             'Last_Name'=>$request->input('surname'),
