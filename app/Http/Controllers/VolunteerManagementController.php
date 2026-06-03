@@ -7,6 +7,7 @@ use App\Models\Volunteer;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 class VolunteerManagementController extends Controller
 {
@@ -27,20 +28,22 @@ class VolunteerManagementController extends Controller
             'Name' => 'required',
             'Last_Name' => 'required',
             'Login' => 'required|unique:accounts,Login',
-            'Password' => 'required|min:6',
             'Email' => 'required|email|unique:accounts,Email',
             'Phone_Num' => 'required',
         ]);
 
-        DB::transaction(function () use ($validated, $request) {
+        $randomPassword = Str::random(8);
+
+        DB::transaction(function () use ($validated, $request, $randomPassword) {
             $account = Account::create([
                 'Name' => $validated['Name'],
                 'Last_Name' => $validated['Last_Name'],
                 'Login' => $validated['Login'],
-                'Password' => Hash::make($validated['Password']),
+                'Password' => Hash::make($randomPassword),
                 'Email' => $validated['Email'],
                 'Phone_Num' => $validated['Phone_Num'],
                 'Acc_State' => 'Pending',
+                'Creation_Date' => now()->format('Y-m-d'),
             ]);
 
             Volunteer::create([
@@ -49,7 +52,8 @@ class VolunteerManagementController extends Controller
             ]);
         });
 
-        return redirect()->route('worker.volunteers.index')->with('success', 'Wolontariusz został dodany do systemu.');
+        return redirect()->route('worker.volunteers.index')
+            ->with('success', "Wolontariusz został dodany! Hasło startowe: {$randomPassword}");
     }
 
     public function show($id)
@@ -103,20 +107,61 @@ class VolunteerManagementController extends Controller
     public function block($id)
     {
         $volunteer = Volunteer::findOrFail($id);
-        if ($volunteer->account) {
-            $volunteer->account->update(['Acc_State' => 'Blocked']);
-        }
-        return redirect()->route('worker.volunteers.index')->with('success', 'Konto wolontariusza zostało zablokowane.');
+        
+        DB::transaction(function () use ($volunteer) {
+            if ($volunteer->account) {
+                $volunteer->account->update(['Acc_State' => 'Blocked']);
+            }
+            
+            $volunteer->schedules()->where('date', '>=', now()->format('Y-m-d'))->delete();
+        });
+
+        return redirect()->route('worker.volunteers.index')->with('success', 'Konto zostało zablokowane, a przyszłe spacery anulowane.');
     }
 
     public function destroy($id)
     {
         $volunteer = Volunteer::findOrFail($id);
         
-        if ($volunteer->account) {
-            $volunteer->account->update(['Acc_State' => 'Deleted']);
+        DB::transaction(function () use ($volunteer) {
+            if ($volunteer->account) {
+                $volunteer->account->update(['Acc_State' => 'Deleted']);
+            }
+            
+            $volunteer->schedules()->where('date', '>=', now()->format('Y-m-d'))->delete();
+        });
+
+        return redirect()->route('worker.volunteers.index')->with('success', 'Status wolontariusza został zmieniony na usunięty, a przyszłe rezerwacje zwolnione.');
+    }
+
+    public function storeRating(Request $request, $id)
+    {
+        $volunteer = Volunteer::findOrFail($id);
+
+        $validated = $request->validate([
+            'rating' => 'required|integer|min:1|max:5',
+            'comment' => 'nullable|string|max:500'
+        ]);
+
+        $volunteer->update([
+            'last_rating' => $validated['rating'],
+            'rating_comment' => $validated['comment']
+        ]);
+
+        return redirect()->route('worker.volunteers.show', $id)->with('success', 'Ocena wolontariusza została pomyślnie dodana.');
+    }
+
+    public function resetPassword($id)
+    {
+        $volunteer = Volunteer::findOrFail($id);
+        if (!$volunteer->account) {
+            return redirect()->route('worker.volunteers.index')->with('error', 'Nie znaleziono powiązanego konta.');
         }
 
-        return redirect()->route('worker.volunteers.index')->with('success', 'Status wolontariusza został zmieniony na usunięty.');
+        $newPassword = Str::random(8);
+        $volunteer->account->update(['Password' => Hash::make($newPassword)]);
+
+        return redirect()->route('worker.volunteers.index')
+            ->with('success', "Hasło dla wolontariusza zostało zresetowane na: <strong>{$newPassword}</strong>");
     }
 }

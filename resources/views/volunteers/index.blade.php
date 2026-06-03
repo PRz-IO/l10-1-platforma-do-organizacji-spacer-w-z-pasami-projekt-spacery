@@ -6,7 +6,7 @@
 
         @if(session('success'))
             <div class="alert" style="background: #d4edda; color: #155724; padding: 12px; margin-bottom: 20px; border-radius: 5px; border: 1px solid #c3e6cb; font-size: 14px;">
-                {{ session('success') }}
+                {!! session('success') !!}
             </div>
         @endif
 
@@ -62,6 +62,13 @@
                                     <a href="{{ route('worker.volunteers.edit', $volunteer->id) }}" style="text-decoration: none;">
                                         <span style="background: #6c757d; color: white; display: inline-block; padding: 6px 12px; font-size: 13px; border-radius: 4px; font-weight: 500; cursor: pointer;">Edytuj</span>
                                     </a>
+
+                                    {{-- Przycisk Resetowania Hasła --}}
+                                    <form action="{{ route('worker.volunteers.reset-password', $volunteer->id) }}" method="POST" style="margin: 0; display: inline;" onsubmit="return confirm('Czy na pewno chcesz zresetować hasło temu wolontariuszowi na losowe?')">
+                                        @csrf
+                                        @method('PATCH')
+                                        <button type="submit" style="background: #17a2b8; color: white; width: auto; padding: 6px 12px; font-size: 13px; cursor: pointer; border: none; border-radius: 4px; font-weight: 500;">Resetuj hasło</button>
+                                    </form>
 
                                     @if($stateLower == 'pending' || $stateLower == 'blocked')
                                         <form action="{{ route('worker.volunteers.approve', $volunteer->id) }}" method="POST" style="margin: 0; display: inline;">
