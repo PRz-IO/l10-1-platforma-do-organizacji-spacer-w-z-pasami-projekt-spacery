@@ -10,7 +10,7 @@
 
     <nav class="navbar">                                                                        
         <div class="nav-links">
-            <a href="#">Spacery</a>
+            <a href="{{ route('walks.index') }}">Spacery</a>
         </div>
         <div class="nav-links">
             @if (\App\Utilities\CurrUser::IsLogged() && \App\Utilities\CurrUser::getRole()=="Worker")

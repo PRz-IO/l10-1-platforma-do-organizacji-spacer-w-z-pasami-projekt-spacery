@@ -3,6 +3,7 @@
 use App\Http\Controllers\LoginController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\VolunteerManagementController;
+use App\Http\Controllers\WalksController;
 
 Route::get('/', function () {
     return redirect("/login");
@@ -33,3 +34,19 @@ Route::prefix('worker')->name('worker.')->group(function () {
 Route::get('/walks-panel', function () {
     return view('walks');
 });
+
+Route::get('/psy/{id}', [WalksController::class, 'show'])->name('dogs.show');
+
+Route::post('/psy/{id}/rezerwuj', [WalksController::class, 'reserve'])->name('walks.reserve');
+
+Route::get('/psy/{id}/zajete-godziny', [WalksController::class, 'getBookedTimes']);
+
+Route::post('/psy/{id}/ulubione', [WalksController::class, 'toggleFavorite'])->name('walks.favorite');
+
+Route::get('/spacery', [WalksController::class, 'index'])->name('walks.index');
+
+Route::post('/spacery/{schedule_id}/notatka', [WalksController::class, 'addNote'])->name('walks.addNote');
+
+Route::post('/spacery/{schedule_id}/ocena', [WalksController::class, 'addGrade'])->name('walks.addGrade');
+
+Route::delete('/spacery/{schedule_id}/anuluj', [WalksController::class, 'cancelWalk'])->name('walks.cancel');
