@@ -37,7 +37,7 @@
             <p style="margin: 6px 0;"><strong>Adres Email:</strong> {{ $volunteer->account?->Email ?? '---' }}</p>
             <p style="margin: 6px 0;"><strong>Numer Telefonu:</strong> {{ $volunteer->account?->Phone_Num ?? '---' }}</p>
             <p style="margin: 6px 0;"><strong>Data rejestracji konta:</strong> {{ $volunteer->account?->Creation_Date ?? '---' }}</p>
-            <p style="margin: 6px 0;"><strong>Kwalifikacje:</strong> {{ $volunteer->Is_Experienced ? 'Doświadczony wolontariusz (Samodzielny)' : 'Brak doświadczenia (Wymaga asysty)' }}</p>
+            <p style="margin: 6px 0;"><strong>Kwalifikacje:</strong> {{ $volunteer->Is_Experienced ? 'Doświadczony wolontariusz (Samodzielny)' : 'Brak doświadczenia' }}</p>
             <p style="margin: 6px 0;"><strong>Ogólna ocena wolontariusza:</strong> 
                 @if($volunteer->average_rating)
                     <span style="color: #ffc107; font-weight: bold; background: #fff9e6; padding: 2px 6px; border-radius: 4px; border: 1px solid #ffeeba;">
