@@ -12,7 +12,7 @@ Route::get('/test', function () {
     return view('test');
 });
 
-
+/*
 
 Route::get('/dogs', [DogsController::class, 'index']);
 Route::get('/dogs/create', [DogsController::class, 'create']);
@@ -21,3 +21,6 @@ Route::get('/dogs/{id}', [DogsController::class, 'show']);
 Route::get('/dogs/{id}/edit', [DogsController::class, 'edit']);
 Route::put('/dogs/{id}', [DogsController::class, 'update']);
 Route::get('/dogs/{id}/walks', [DogsController::class, 'walks']);
+
+
+*/
