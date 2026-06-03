@@ -16,21 +16,26 @@ class VolunteerManagementController extends Controller
 {
     $search = $request->input('search');
 
-    $query = Volunteer::with('account')
-        ->withAvg('schedules as average_rating', 'Grade');
-    
-        if (!empty($search)) {
-        $query->whereHas('account', function ($q) use ($search) {
-            $q->where('Last_Name', 'like', "%{$search}%")
-              ->orWhere('Name', 'like', "%{$search}%")
-              ->orWhere('Login', 'like', "%{$search}%");
+    $query = Volunteer::query()
+        ->join('accounts', 'volunteers.account_id', '=', 'accounts.id')
+        ->select('volunteers.*')
+        ->with('account')
+        ->withAvg('schedules as average_rating', 'Grade'); 
+
+
+    if ($search) {
+        $query->where(function ($q) use ($search) {
+            $q->where('accounts.Last_Name', 'like', "%{$search}%")
+              ->orWhere('accounts.Name', 'like', "%{$search}%")
+              ->orWhere('accounts.Login', 'like', "%{$search}%");
         });
     }
+    $volunteers = $query->orderBy('accounts.Name', 'asc')
+                        ->orderBy('accounts.Last_Name', 'asc')
+                        ->get();
 
-    $volunteers = $query->get();
     return view('volunteers.index', compact('volunteers', 'search'));
 }
-    
 
     public function create()
     {
@@ -39,16 +44,23 @@ class VolunteerManagementController extends Controller
 
     public function store(Request $request)
     {
+        // 1. Dodajemy walidację - w tym regułę 'unique' dla Phone_Num
         $validated = $request->validate([
             'Name' => 'required',
             'Last_Name' => 'required',
             'Login' => 'required|unique:accounts,Login',
             'Email' => 'required|email|unique:accounts,Email',
-            'Phone_Num' => 'required',
+            'Phone_Num' => 'required|unique:accounts,Phone_Num', // <--- TO JEST KLUCZOWE
+        ], [
+            // Opcjonalne: czytelne komunikaty po polsku
+            'Phone_Num.unique' => 'Ten numer telefonu jest już przypisany do innego konta w systemie.',
+            'Email.unique' => 'Ten email jest już zajęty.',
+            'Login.unique' => 'Ten login jest już zajęty.',
         ]);
 
         $randomPassword = substr(str_shuffle('abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ123456789'), 0, 8);
 
+        // 2. Jeśli walidacja przejdzie, kod wykonuje się bezpiecznie
         DB::transaction(function () use ($validated, $request, $randomPassword) {
             $account = Account::create([
                 'Name' => $validated['Name'],
@@ -56,7 +68,7 @@ class VolunteerManagementController extends Controller
                 'Login' => $validated['Login'],
                 'Password' => Hash::make($randomPassword),
                 'Email' => $validated['Email'],
-                'Phone_Num' => $validated['Phone_Num'],
+                'Phone_Num' => $validated['Phone_Num'], // Teraz walidator pilnuje, by to było unikalne
                 'Acc_State' => 'Pending',
                 'Creation_Date' => now()->format('Y-m-d'),
             ]);
@@ -68,7 +80,7 @@ class VolunteerManagementController extends Controller
         });
 
         return redirect()->route('worker.volunteers.index')
-        ->with('success', "Wolontariusz został dodany! Hasło startowe: <strong style='font-family: Consolas, Courier New, monospace; font-size: 16px; background: #fff; padding: 4px 8px; border: 1px solid #ced4da; border-radius: 4px; letter-spacing: 2px; color: #dc3545;'>{$randomPassword}</strong>");
+            ->with('success', "Wolontariusz został dodany! Hasło startowe: <strong style='font-family: Consolas, Courier New, monospace; font-size: 16px; background: #fff; padding: 4px 8px; border: 1px solid #ced4da; border-radius: 4px; letter-spacing: 2px; color: #dc3545;'>{$randomPassword}</strong>");
     }
 
     public function show($id)
@@ -109,7 +121,8 @@ class VolunteerManagementController extends Controller
             'Is_Experienced' => $request->has('Is_Experienced'),
         ]);
 
-        return redirect()->route('worker.volunteers.index')->with('success', 'Dane wolontariusza zostały zaktualizowane.');
+        return redirect()->route('worker.volunteers.show', $id)
+                     ->with('success', 'Dane wolontariusza zostały pomyślnie zaktualizowane.');
     }
 
     public function approve($id)
@@ -118,7 +131,7 @@ class VolunteerManagementController extends Controller
         if ($volunteer->account) {
             $volunteer->account->update(['Acc_State' => 'Active']);
         }
-        return redirect()->route('worker.volunteers.index')->with('success', 'Konto wolontariusza zostało aktywowane.');
+        return redirect()->back()->with('success', 'Konto wolontariusza zostało aktywowane.');
     }
 
     public function block($id)
@@ -133,7 +146,7 @@ class VolunteerManagementController extends Controller
             $volunteer->schedules()->where('date', '>=', now()->format('Y-m-d'))->delete();
         });
 
-        return redirect()->route('worker.volunteers.index')->with('success', 'Konto zostało zablokowane, a przyszłe spacery anulowane.');
+        return redirect()->back()->with('success', 'Konto wolontariusza zostało zablokowane.');
     }
 
     public function destroy($id)
@@ -178,7 +191,7 @@ class VolunteerManagementController extends Controller
         $newPassword = substr(str_shuffle('abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789'), 0, 8);
         $volunteer->account->update(['Password' => Hash::make($newPassword)]);
 
-        return redirect()->route('worker.volunteers.index')
+        return redirect()->back()
         ->with('success', "Hasło dla wolontariusza zostało zresetowane na: <strong style='font-family: Consolas, Courier New, monospace; font-size: 16px; background: #fff; padding: 4px 8px; border: 1px solid #ced4da; border-radius: 4px; letter-spacing: 2px; color: #dc3545;'>{$newPassword}</strong>");
     }
     public function rateSchedule(Request $request, $id)
