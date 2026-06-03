@@ -9,21 +9,27 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 #[WithoutTimestamps]
 class Account extends Model
 {
+    protected $table = 'accounts';
+    protected $primaryKey = 'id';
+
     protected $fillable =[
         'Name',
         'Last_Name',
         'Login',
         'Password',
-        'Acc_State',
+        'Date',       
+        'Acc_State',   
         'Email',
-        'Phone_Num'
+        'Phone_Num'    
     ];
-    public function worker():HasOne
+
+    public function worker(): HasOne
     {
-        return $this->hasOne(Worker::class);
+        return $this->hasOne(Worker::class, 'account_id', 'id');
     }
-    public function volunteer():HasOne
+
+    public function volunteer(): HasOne
     {
-        return $this->hasOne(Volunteer::class);
+        return $this->hasOne(Volunteer::class, 'account_id', 'id');
     }
 }
