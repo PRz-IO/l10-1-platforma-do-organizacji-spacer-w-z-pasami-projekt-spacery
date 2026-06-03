@@ -13,7 +13,7 @@ use App\Models\Schedule;
 class VolunteerManagementController extends Controller
 {
     public function index(Request $request)
-{
+    {
     $search = $request->input('search');
 
     $query = Volunteer::with('account')
@@ -29,7 +29,7 @@ class VolunteerManagementController extends Controller
 
     $volunteers = $query->get();
     return view('volunteers.index', compact('volunteers', 'search'));
-}
+    }
     
 
     public function create()
@@ -109,7 +109,8 @@ class VolunteerManagementController extends Controller
             'Is_Experienced' => $request->has('Is_Experienced'),
         ]);
 
-        return redirect()->route('worker.volunteers.index')->with('success', 'Dane wolontariusza zostały zaktualizowane.');
+        return redirect()->route('worker.volunteers.show', $id)
+                     ->with('success', 'Dane wolontariusza zostały pomyślnie zaktualizowane.');
     }
 
     public function approve($id)
@@ -118,7 +119,7 @@ class VolunteerManagementController extends Controller
         if ($volunteer->account) {
             $volunteer->account->update(['Acc_State' => 'Active']);
         }
-        return redirect()->route('worker.volunteers.index')->with('success', 'Konto wolontariusza zostało aktywowane.');
+        return redirect()->back()->with('success', 'Konto wolontariusza zostało aktywowane.');
     }
 
     public function block($id)
@@ -133,7 +134,7 @@ class VolunteerManagementController extends Controller
             $volunteer->schedules()->where('date', '>=', now()->format('Y-m-d'))->delete();
         });
 
-        return redirect()->route('worker.volunteers.index')->with('success', 'Konto zostało zablokowane, a przyszłe spacery anulowane.');
+        return redirect()->back()->with('success', 'Konto wolontariusza zostało zablokowane.');
     }
 
     public function destroy($id)
@@ -178,7 +179,7 @@ class VolunteerManagementController extends Controller
         $newPassword = substr(str_shuffle('abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789'), 0, 8);
         $volunteer->account->update(['Password' => Hash::make($newPassword)]);
 
-        return redirect()->route('worker.volunteers.index')
+        return redirect()->back()
         ->with('success', "Hasło dla wolontariusza zostało zresetowane na: <strong style='font-family: Consolas, Courier New, monospace; font-size: 16px; background: #fff; padding: 4px 8px; border: 1px solid #ced4da; border-radius: 4px; letter-spacing: 2px; color: #dc3545;'>{$newPassword}</strong>");
     }
     public function rateSchedule(Request $request, $id)
