@@ -1,46 +1,66 @@
 
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: Arial, sans-serif; background: #f4f6f9; color: #333; }
+        * { box-sizing: border-box; margin: 0px; padding: 0px; }
+        html {margin: 0px;  min-height: 100vh;}
+        body { font-family: Arial, sans-serif; background: #f4f6f9; color: #333; min-height: 100vh; margin: 0px; padding: 0px;}
 
         .navbar {
-            display: flex;                 
-            justify-content: space-between; 
-            align-items: center;           
+            display:flex;         
+            flex-wrap: wrap;
+            justify-content: space-around;
             background-color: white;       
             border: 3px solid black;       
-            padding: 10px 20px;            
-            width: 100%;                  
+            
+            width: 100%;     
+            overflow: hidden;  
+            min-width: none;   
+            min-height: none;   
         }
 
         .nav-links {
-            display: flex;                  
+            display: block;                  
             gap: 40px;                      
-            list-style: none;               
+            list-style: none;
+            height: 100%;
+            padding: 10px 20px;  
+            float: left;
+            /*width: calc(100%/6);*/
+            width: auto;
         }
         .nav-links .nav-dummy{
             text-decoration: none; 
             color: gray;                   
-            font-size: 18px; 
+            font-size: 100%; 
         }
         .nav-links a {
             text-decoration: none;          
             color: black;                   
-            font-size: 18px;                
+            font-size: 100%;  
+              
         }
         
         /* GŁÓWNA TREŚĆ STRONY */
         .main-content {
-            max-width: 600px;              
-            margin: 30px auto;            
-            padding: 0 20px;
+            min-height: 100vh;
+            width: 100%;            
+            padding: 30px 20px;
+            /*
+            background-image: url("");
+            background-repeat: no-repeat;
+            background-size: 100% 100%;
+            */
         }
 
         .container { 
+            max-width: 600px;
             background: white; 
+            width: 60vw;   
+            margin: 0px auto;  
             padding: 20px;                
             border-radius: 8px;             
             box-shadow: 0 2px 4px rgba(0,0,0,0.1); 
-            margin-bottom: 20px;           
+            margin-bottom: 20px;   
+            text-align: center;
+            align-items: center;            
         }
 
         h2 { border-bottom: 2px solid #eee; padding-bottom: 10px; margin-bottom: 15px; }

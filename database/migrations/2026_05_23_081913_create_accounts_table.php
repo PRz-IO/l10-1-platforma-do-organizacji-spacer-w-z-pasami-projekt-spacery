@@ -16,8 +16,8 @@ return new class extends Migration
             $table->string('Name',80);
             $table->string('Last_Name',80);
             $table->string('Login',80)->unique();
-            $table->string('Password',80);
-            $table->date('Creation_Date')->default(now()->format('Y-m-d'));
+            $table->string('Password',160);
+            $table->date('Creation_Date')->useCurrent();
             $table->string('Acc_State',80);
             #$table->timestamps();
         });

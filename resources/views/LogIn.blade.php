@@ -2,7 +2,7 @@
     @push('styles')
         <link rel="stylesheet" href="{{ asset('css/login.css') }}">
     @endpush
-    <div class="czesc">
+    <div class="container">
         <h3>Logowanie</h3><br><br>
         <form action="{{ route('login.login') }}" method="post">
             @csrf
@@ -15,7 +15,7 @@
             <button type="submit" class="LogBtn">Zaloguj</button>
         </form>
         <br>
-        <form action="/signup">
+        <form action="{{ route('signup.index') }}">
         <button type="submit" class="LogBtn">Rejestracja</button>
         </form>
         <br><br><br>

@@ -4,8 +4,8 @@ namespace App\Http\Controllers;
 
 use App\DTOs\CurrentUserDTO;
 use App\Utilities\CurrUser;
-use Dotenv\Exception\ValidationException;
 use Exception;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\Request;
 use App\Models\Account;
 
@@ -16,13 +16,7 @@ class LoginController extends Controller
     }
 
     public function Login(Request $request){
-        if(CurrUser::IsLogged()){
-            error_log("Zalogowany");
-        }
-        else{
-            error_log("Nie Zalogowany");
-        }
-        $L = $request->input('login');
+        
         try{
             $request->validate([
                 'login' => 'required|string|max:80',
@@ -30,12 +24,21 @@ class LoginController extends Controller
             ]);
         }
         catch(Exception $e){
-            return view('LogIn')->with('L',$L)->with('Err','Nie podano loginu lub hasła');
+            return view('LogIn')->with('L',$request->input('login'))->with('Err','Nie podano loginu lub hasła');
         }
 
-        $acc = Account::where('Login',$L)->where('Password',$request->input('password'))->first();
+        $L = $request->input('login');
+        $acc = Account::where('Login',$L)->first();
         if(is_null($acc)){
-            return view('LogIn')->with('L',$L)->with('Err','Błędne dane logowania');
+            return view('LogIn')->with('L',$L)->with('Err','Błędny Login');
+        }
+
+        //$acc = Account::where('Login',$L)->where('Password',$request->input('password'))->first();
+        if(! Hash::check($request->input('password'),$acc->Password)){
+            return view('LogIn')->with('L',$L)->with('Err','Błędne hasło');
+        }
+        if($acc->Acc_State == "Banned" || $acc->Acc_State == "Deleted"){
+            return view('LogIn')->with('Err','To konto jest zablokowane');
         }
         $id=$acc->id;
         $role="";

@@ -1,0 +1,29 @@
+.LogInp{
+    width: auto;
+}
+
+.LogBtn{
+    width: auto;
+    font-size: 80%;
+    margin: 0 auto;
+}
+.haikyuu{
+    display: grid;
+    grid-template-rows: 10% 80% 10%;
+    grid-template-columns: auto;
+    height: 100%;
+}
+.haikyuu div{
+    text-align: center;
+    align-items: center;
+    justify-content: center;
+    align-content: center;
+    height: 100%;
+    width: 100%;
+}
+.haikyuu1{
+    display: grid;
+    grid-template-rows: 20% 20% 20% 20% 10% 10%;
+    grid-template-columns: 1fr 1fr ;
+    height: 100%;    
+}
