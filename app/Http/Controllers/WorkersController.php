@@ -6,14 +6,29 @@ use App\DTOs\WorkerDTO;
 use App\Models\Account;
 use App\Models\Worker;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+
+
+
 
 class WorkersController extends Controller
 {
     public function index()
     {
-        $workers = Worker::with('account')->get();
+        $query = Worker::with('account');
+
+        // hide deleted workers for non-admins
+        // Uncomment once logging in works
+        if (!auth()->user()?->Is_Admin) {
+            $query->whereHas('account', function ($q) {
+                $q->where('Acc_State', '!=', 'Deleted');
+            });
+        }
+
+        $workers = $query->get();
+
         return view('workers.index', compact('workers'));
     }
 
@@ -21,15 +36,14 @@ class WorkersController extends Controller
 
     public function show($id)
     {
-        $worker = Worker::with('account')->find($id);
+        $worker = Worker::with([
+            'account',
+            'schedules.volunteer',
+            'schedules.dog'
+        ])->findOrFail($id);
 
-        if (!$worker) {
-            return response()->json([
-                'message' => 'Worker not found'
-            ], 404);
-        }
-
-        return view('workers.show', compact('worker'));
+        $schedules = $worker->schedules()->orderByDesc('Date')->orderByDesc('Time')->get();
+        return view('workers.show', compact('worker', 'schedules'));
     }
 
     public function create()
@@ -39,15 +53,17 @@ class WorkersController extends Controller
 
     public function store(Request $request)
     {
+        $password = Str::random(10);
         $validated = $request->validate([
-            'Name' => 'required|string|max:40',
-            'Last_Name' => 'required|string|max:40',
-            'Login' => 'required|string|max:40|unique:Accounts,Login',
-            'Password' => 'required|string|min:6',
-            'Email' => 'required|string|max:60',
-            'Phone_Num' => 'required|string|max:40',
-            'Is_Admin' => 'nullable|boolean',
+            'Name' => 'required|string',
+            'Last_Name' => 'required|string',
+            'Login' => 'required|string',
+            'Email' => 'required|email',
+            'Phone_Num' => 'required|string',
+            'Is_Admin' => 'boolean',
         ]);
+
+        $validated['Password'] = $password;
 
         $dto = WorkerDTO::fromArray($validated);
 
@@ -57,59 +73,34 @@ class WorkersController extends Controller
             $worker = Worker::create($dto->toWorkerArray($account->getKey()));
         });
 
-        return redirect()->route('workers.index')->with('success', 'Pracownik utworzony');
+        return redirect()->route('workers.index')->with('success', 'Pracownik utworzony')->with('generated_password', $password);
     }
 
 
-    // TO DO:
-    // Needs fixing
-    // Update somewhere god knows where loses connection or something
-    // Tests return error 404
     public function update(Request $request, $id)
     {
-        $worker = Worker::find($id);
-
-        if (!$worker) {
-            return response()->json([
-                'message' => 'Worker not found'
-            ], 404);
-        }
-
-        $account = Account::find($worker->Account_Id);
-
-        if (!$account) {
-            return response()->json([
-                'message' => 'Account not found'
-            ], 404);
-        }
-
-
+        $worker = Worker::findOrFail($id);
+        $account = Account::findOrFail($worker->account_id);
         $validated = $request->validate([
             'Name' => 'required|string|max:40',
             'Last_Name' => 'required|string|max:40',
-            'Login' => 'required|string|max:40',
-            'Password' => 'required|string|min:6',
-            'Email' => 'required|string|max:60',
+            'Email' => 'required|email|max:60',
             'Phone_Num' => 'required|string|min:9|max:9',
-            'Acc_State' => 'nullable|string|max:40',            
-            'Is_Admin' => 'boolean'
+            'Is_Admin' => 'nullable|boolean',
         ]);
 
-        $dto = WorkerDTO::fromArray($validated);
-
-        $account->update(
-            $dto->toAccountArray()
-        );
-    
-
-        $worker->update(
-            $dto->toWorkerArray($account->Id)
-        );
-
-        return response()->json([
-            'account' => $account,
-            'worker' => $worker
+        $account->update([
+            'Name' => $validated['Name'],
+            'Last_Name' => $validated['Last_Name'],
+            'Email' => $validated['Email'],
+            'Phone_Num' => $validated['Phone_Num'],
         ]);
+
+        $worker->update([
+            'Is_Admin' => $request->boolean('Is_Admin'),
+        ]);
+
+        return redirect()->route('workers.index')->with('success', 'Dane pracownika zostały zaktualizowane.');
     }
 
 
@@ -124,18 +115,24 @@ class WorkersController extends Controller
             ], 404);
         }
 
-        $account = Account::find($worker->Account_Id);
+        $account = Account::find($worker->account_id);
 
-        $worker->delete();
-
-        if ($account) {
-            $account->delete();
+        if (!$account) {
+            return response()->json([
+                'message' => 'Account not found'
+            ], 404);
         }
 
-        return response()->json([
-            'message' => 'Worker deleted'
+        $account->update([
+            'Acc_State' => 'Deleted'
         ]);
+
+        $worker->update(['Is_Admin' => false]);
+
+        return redirect()->route('workers.index')->with('success', 'Pracownik został usunięty.');
     }
+
+
 
     public function edit($id)
     {
@@ -148,5 +145,44 @@ class WorkersController extends Controller
         }
 
         return view('workers.edit', compact('worker'));
+    }
+
+    public function block($id)
+    {
+        $worker = Worker::findOrFail($id);
+        $account = Account::find($worker->account_id);
+
+        $account->update([
+            'Acc_State' => 'Blocked'
+        ]);
+
+        return redirect()->back()->with('success', 'Pracownik został zablokowany.');
+    }
+
+
+    public function unblock($id)
+    {
+        $worker = Worker::findOrFail($id);
+        $account = Account::find($worker->account_id);
+
+        $account->update([
+            'Acc_State' => 'Active'
+        ]);
+
+        return redirect()->back()
+    ->with('success', 'Pracownik został odblokowany.');
+    }
+
+    public function resetPassword($id)
+    {
+        $worker = Worker::with('account')->findOrFail($id);
+
+        $password = Str::random(10);
+
+        $worker->account->update([
+            'Password' => bcrypt($password),
+        ]);
+
+        return redirect()->back()->with('success', 'Hasło zostało zresetowane.')->with('generated_password', $password);
     }
 }

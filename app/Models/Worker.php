@@ -15,7 +15,7 @@ class Worker extends Model
     protected $primaryKey = 'id';
 
         protected $fillable =[
-        'Account_Id',
+        'account_id',
         'Is_Admin'
     ];
     public function account():BelongsTo
@@ -24,7 +24,7 @@ class Worker extends Model
     }
     public function schedules():HasMany
     {
-        return $this->hasMany(Schedule::class, 'account_id', 'id');
+        return $this->hasMany(Schedule::class, 'supervisor_id', 'id');
     }
     
 }

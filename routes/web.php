@@ -5,7 +5,25 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\WorkersController;
 
 Route::view('/layout-test', 'components.layout');
+
+
 Route::resource('workers', WorkersController::class);
+Route::patch(
+    '/workers/{worker}/block',
+    [WorkersController::class, 'block']
+)->name('workers.block');
+
+Route::patch(
+    '/workers/{worker}/unblock',
+    [WorkersController::class, 'unblock']
+)->name('workers.unblock');
+Route::post(
+    '/workers/{worker}/reset-password',
+    [WorkersController::class, 'resetPassword']
+)->name('workers.reset-password');
+
+
+
 use App\Http\Controllers\VolunteerManagementController;
 
 Route::get('/', function () {

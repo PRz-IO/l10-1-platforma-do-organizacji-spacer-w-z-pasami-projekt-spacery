@@ -2,3 +2,228 @@
 TO DO:
 actually create showing single worker info
 -->
+<x-layout>
+    @php
+        $state = $worker->account?->Acc_State ?? 'Unknown';
+        $stateLower = strtolower($state);
+
+        $map = [
+            'active' => ['#d4edda', '#155724', '#c3e6cb'],
+            'blocked' => ['#f8d7da', '#721c24', '#f5c6cb'],
+            'deleted' => ['#e2e3e5', '#383d41', '#d6d8db'],
+            'default' => ['#fff3cd', '#856404', '#ffeeba'],
+        ];
+
+        [$bg, $color, $border] = $map[$stateLower] ?? $map['default'];
+    @endphp
+    <div class="container">
+    <h2>Pełne informacje o pracowniku</h2>
+
+    @if(session('success'))
+        <div style="background:#d4edda; padding:10px; margin-bottom:15px;">
+            {{ session('success') }}
+        </div>
+    @endif
+
+    @if(session('generated_password'))
+        <div style="background:#fff3cd; padding:10px; margin-bottom:15px;">
+            <strong>Wygenerowane hasło:</strong>
+            {{ session('generated_password') }}
+        </div>
+    @endif
+
+    <div style="border:1px solid #ddd; padding:20px; border-radius:6px; margin-bottom:20px;">
+
+        <h3 style="margin-top:0;">
+            {{ $worker->account?->Name }}
+            {{ $worker->account?->Last_Name }}
+
+            <span
+                style="
+                    margin-left:8px;
+                    padding:3px 8px;
+                    background: {{ $bg }};
+                    color: {{ $color }};
+                    border:1px solid {{ $border }};
+                    border-radius:4px;
+                    font-size:12px;
+                ">
+                {{ $state }}
+            </span>
+        </h3>
+        @if(auth()->user()?->worker?->Is_Admin)
+            <p><strong>Login:</strong> {{ $worker->account?->Login }}</p>
+        @endif
+        <p><strong>Email:</strong> {{ $worker->account?->Email }}</p>
+        <p><strong>Telefon:</strong> {{ $worker->account?->Phone_Num }}</p>
+
+        <p>
+            <strong>Administrator:</strong>
+            {{ $worker->Is_Admin ? 'Tak' : 'Nie' }}
+        </p>
+
+    </div>
+    <div style="
+        margin-top:15px;
+        display:flex;
+        flex-wrap:wrap;
+        gap:8px;
+    ">
+
+        @if(auth()->user()?->worker?->Is_Admin)
+
+            <a href="{{ route('workers.edit', $worker->getKey()) }}">
+                <button type="button">
+                    Edytuj
+                </button>
+            </a>
+
+            <form method="POST"
+                action="{{ route('workers.reset-password', $worker->getKey()) }}">
+                @csrf
+
+                <button type="submit"
+                        style="background:#ffc107;">
+                    Reset hasła
+                </button>
+            </form>
+
+            @if($worker->account?->Acc_State === 'Active')
+
+                <form method="POST"
+                    action="{{ route('workers.block', $worker->getKey()) }}">
+                    @csrf
+                    @method('PATCH')
+
+                    <button type="submit"
+                            style="background:#fd7e14; color:white;">
+                        Zablokuj
+                    </button>
+                </form>
+
+            @elseif($worker->account?->Acc_State === 'Blocked')
+
+                <form method="POST"
+                    action="{{ route('workers.unblock', $worker->getKey()) }}">
+                    @csrf
+                    @method('PATCH')
+
+                    <button type="submit"
+                            style="background:#28a745; color:white;">
+                        Odblokuj
+                    </button>
+                </form>
+
+            @endif
+
+            <form method="POST"
+                action="{{ route('workers.destroy', $worker->getKey()) }}"
+                onsubmit="return confirm('Oznaczyć konto jako usunięte?')">
+
+                @csrf
+                @method('DELETE')
+
+                <button type="submit"
+                        style="background:red; color:white;">
+                    Usuń
+                </button>
+            </form>
+            
+        @endif
+
+    </div>
+
+    <hr style="margin:30px 0;">
+
+    <h3>Harmonogramy przypisane do pracownika</h3>
+
+    <br>
+
+    @if($schedules->isEmpty())
+
+        <div style="border:1px solid #ddd; padding:15px; border-radius:6px;">
+            Brak przypisanych harmonogramów.
+        </div>
+    @else
+
+    <table
+        style="
+            width:100%;
+            border-collapse:collapse;
+            background:white;
+        ">
+    <thead>
+        <tr style="background:#f8f9fa;">
+            <th style="padding:10px; border:1px solid #ddd;">Data</th>
+            <th style="padding:10px; border:1px solid #ddd;">Godzina</th>
+            <th style="padding:10px; border:1px solid #ddd;">Wolontariusz</th>
+            <th style="padding:10px; border:1px solid #ddd;">Pies</th>
+            <th style="padding:10px; border:1px solid #ddd;">Ocena</th>
+        </tr>
+    </thead>
+
+        <tbody>
+        @foreach($schedules as $schedule)
+        <tr>
+            <td style="padding:10px; border:1px solid #ddd;">
+                {{ $schedule->Date }}
+            </td>
+
+            <td style="padding:10px; border:1px solid #ddd;">
+                {{ $schedule->Time }}
+            </td>
+            
+            <td style="padding:10px; border:1px solid #ddd;">
+                {{ $schedule->volunteer?->account?->Name ?? '-' }}
+                {{ $schedule->volunteer?->account?->Last_Name ?? '' }}
+            </td>
+
+            <td style="padding:10px; border:1px solid #ddd;">
+                {{ $schedule->dog?->Name ?? '-' }}
+            </td>
+
+            <td style="padding:10px; border:1px solid #ddd;">
+                
+                @if($schedule->Grade)
+                    <div style="color:gold; font-size:16px;">
+                        {{ str_repeat('★', $schedule->Grade) }}
+                        <span style="color:#ccc;">
+                            {{ str_repeat('☆', 5 - $schedule->Grade) }}
+                        </span>
+                        <small style="color:#333;">
+                            ({{ $schedule->Grade }}/5)
+                        </small>
+                    </div>
+                @else
+                    <div>-</div>
+                @endif
+
+                <div style="margin-top:8px;">
+                    <!-- UNCOMMENT ONCE schedules.show exists -->
+                    <a href="{{ route('schedules.show', $schedule->id) }}">
+                    {{-- <a href=""> --}}
+                        <button style="padding:4px 8px; font-size:12px;">
+                            Szczegóły
+                        </button>
+                    </a>
+                </div>
+
+            </td>
+        </tr>
+        @endforeach
+        </tbody>
+    </table>
+
+    @endif
+    
+    <div style="margin-top:30px; display:flex; justify-content:flex-start;">
+        <a href="{{ route('workers.index') }}">
+            <button type="button"
+                    style="padding:8px 14px; border:1px solid #ddd; background:#f8f9fa; cursor:pointer; color:#000;">
+                ← Powrót do listy pracowników
+            </button>
+        </a>
+    </div>
+    </div>
+</div>
+</x-layout>

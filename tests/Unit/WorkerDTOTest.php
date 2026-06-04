@@ -68,7 +68,7 @@ class WorkerDTOTest extends TestCase
 
         $workerArray = $dto->toWorkerArray(5);
 
-        $this->assertEquals(5, $workerArray['Account_Id']);
+        $this->assertEquals(5, $workerArray['account_id']);
         $this->assertTrue($workerArray['Is_Admin']);
     }
 }

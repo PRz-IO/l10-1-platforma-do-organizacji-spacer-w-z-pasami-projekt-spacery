@@ -4,6 +4,9 @@ namespace App\DTOs;
 
 use Illuminate\Http\Request;
 
+// TODO:
+// Split WorkerDTO into Create and Update Worker DTO
+
 final readonly class WorkerDTO
 {
     public function __construct
@@ -54,7 +57,7 @@ final readonly class WorkerDTO
     public function toWorkerArray(int $accountId): array
     {
         return [
-            'Account_Id' => $accountId,
+            'account_id' => $accountId,
             'Is_Admin' => $this->isAdmin
         ];
     }

@@ -18,8 +18,6 @@ class WorkersControllerTest extends TestCase
 
     public function test_index_returns_workers(): void
     {
-        $this->withoutExceptionHandling();
-
         $account = Account::create([
             'Name' => 'John',
             'Last_Name' => 'Impact',
@@ -31,7 +29,7 @@ class WorkersControllerTest extends TestCase
         ]);
 
         Worker::create([
-            'Account_Id' => $account->getKey(),
+            'account_id' => $account->getKey(),
             'Is_Admin' => true
         ]);
 
@@ -89,7 +87,7 @@ class WorkersControllerTest extends TestCase
         ]);
 
         $worker = Worker::create([
-            'Account_Id' => $account->getKey(),
+            'account_id' => $account->getKey(),
             'Is_Admin' => false
         ]);
 
@@ -115,7 +113,7 @@ class WorkersControllerTest extends TestCase
         $response->assertStatus(200);
 
         $this->assertDatabaseHas('Accounts', [
-            'Id' => $account->getKey(),
+            'id' => $account->getKey(),
             'Name' => 'John',
             'Last_Name' => 'Rail',
             'Login' => 'johnrail',
@@ -126,7 +124,7 @@ class WorkersControllerTest extends TestCase
         ]);
 
         $this->assertDatabaseHas('Workers', [
-            'Id' => $worker->getKey(),
+            'id' => $worker->getKey(),
             'Is_Admin' => true
         ]);
     }
@@ -144,12 +142,21 @@ class WorkersControllerTest extends TestCase
         ]);
 
         $worker = Worker::create([
-            'Account_Id' => $account->getKey(),
+            'account_id' => $account->getKey(),
             'Is_Admin' => false
         ]);
 
         $response = $this->delete(route('workers.destroy', $worker));
 
         $response->assertStatus(200);
+
+        $this->assertDatabaseHas('accounts', [
+            'id' => $account->id,
+            'Acc_State' => 'Deleted'
+        ]);
+
+        $this->assertDatabaseHas('workers', [
+            'id' => $worker->id
+        ]);
     }
 }
