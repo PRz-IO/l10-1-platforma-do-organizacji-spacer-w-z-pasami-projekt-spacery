@@ -200,8 +200,8 @@ actually create showing single worker info
 
                 <div style="margin-top:8px;">
                     <!-- UNCOMMENT ONCE schedules.show exists -->
-                    <a href="{{ route('schedules.show', $schedule->id) }}">
-                    {{-- <a href=""> --}}
+                    {{-- <a href="{{ route('walks.show', $schedule->id) }}"> --}}
+                    <a href="">
                         <button style="padding:4px 8px; font-size:12px;">
                             Szczegóły
                         </button>
