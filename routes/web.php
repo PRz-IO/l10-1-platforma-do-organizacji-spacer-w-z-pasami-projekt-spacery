@@ -43,6 +43,9 @@ Route::middleware('admin.worker')->group(function () {
     Route::patch('workers/{worker}/unblock', [WorkersController::class, 'unblock'])
         ->name('workers.unblock');
 
+    Route::patch('workers/{worker}/approve', [WorkersController::class, 'approve'])
+        ->name('workers.approve');
+
     Route::post('workers/{worker}/reset-password', [WorkersController::class, 'resetPassword'])
         ->name('workers.reset-password');
 });

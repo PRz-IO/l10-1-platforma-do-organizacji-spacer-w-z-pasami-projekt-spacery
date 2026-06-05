@@ -122,6 +122,19 @@ actually create showing single worker info
                     </button>
                 </form>
 
+            @elseif($worker->account?->Acc_State === 'Pending')
+
+                <form method="POST"
+                    action="{{ route('workers.approve', $worker->getKey()) }}">
+                    @csrf
+                    @method('PATCH')
+
+                    <button type="submit"
+                            style="background:#28a745; color:white;">
+                        Zatwierdź
+                    </button>
+                </form>
+
             @endif
 
             <form method="POST"

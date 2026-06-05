@@ -173,6 +173,19 @@ class WorkersController extends Controller
     ->with('success', 'Pracownik został odblokowany.');
     }
 
+    public function approve($id)
+    {
+        $worker = Worker::findOrFail($id);
+        $account = Account::find($worker->account_id);
+
+        $account->update([
+            'Acc_State' => 'Active'
+        ]);
+
+        return redirect()->back()
+    ->with('success', 'Pracownik został zatwierdzony.');
+    }
+
     public function resetPassword($id)
     {
         $worker = Worker::with('account')->findOrFail($id);
