@@ -168,6 +168,19 @@ Creating, updating and deleting workers should be available only to admin
                                 </button>
                             </form>
 
+                        @elseif($worker->account?->Acc_State === 'Pending')
+
+                            <form method="POST"
+                                action="{{ route('workers.approve', $worker->id) }}">
+                                @csrf
+                                @method('PATCH')
+
+                                <button type="submit"
+                                        style="background:#28a745; color:white;">
+                                    Zatwierdź
+                                </button>
+                            </form>
+
                         @endif
 
                         <form action="{{ route('workers.destroy', $worker->id) }}"
