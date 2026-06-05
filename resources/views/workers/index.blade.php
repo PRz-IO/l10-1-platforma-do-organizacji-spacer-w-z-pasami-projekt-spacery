@@ -25,7 +25,11 @@ Creating, updating and deleting workers should be available only to admin
             </div>
         @endif
 
-        @if(auth()->user()?->worker?->Is_Admin)
+        @if(\App\Utilities\CurrUser::IsLogged() && 
+            \App\Utilities\CurrUser::getRole()=="Worker" &&
+            \App\Utilities\CurrUser::getAcc_State() !="Pending" &&
+            \App\Utilities\CurrUser::getParam() ==True
+        )
             <div style="text-align:right; margin-bottom:20px;">
                 <a href="{{ route('workers.create') }}">
                     <button>+ Dodaj pracownika</button>
@@ -77,8 +81,15 @@ Creating, updating and deleting workers should be available only to admin
                     <br><br>
 
                     <small>
+                        {{-- @if (\App\Utilities\CurrUser::IsLogged()) --}}
+                            
 
-                        @if(auth()->user()?->worker?->Is_Admin)
+                        @if(\App\Utilities\CurrUser::IsLogged() && 
+                            \App\Utilities\CurrUser::getRole()=="Worker" &&
+                            \App\Utilities\CurrUser::getAcc_State() !="Pending" &&
+                            \App\Utilities\CurrUser::getParam() ==True
+                        )
+                        
                             Login: {{ $worker->account?->Login ?? '---' }}
                             <br>
                         @endif
@@ -109,7 +120,11 @@ Creating, updating and deleting workers should be available only to admin
                         </button>
                     </a>
 
-                    @if(auth()->user()?->worker?->Is_Admin)
+                        @if(\App\Utilities\CurrUser::IsLogged() && 
+                            \App\Utilities\CurrUser::getRole()=="Worker" &&
+                            \App\Utilities\CurrUser::getAcc_State() !="Pending" &&
+                            \App\Utilities\CurrUser::getParam() ==True
+                        )
 
                         <a href="{{ route('workers.edit', $worker->id) }}">
                             <button type="button">

@@ -8,9 +8,7 @@ use App\Utilities\CurrUser;
 
 class AdminWorkerMiddleware
 {
-    use App\Utilities\CurrUser;
-
-    public function handle($request, Closure $next)
+    public function handle(Request $request, Closure $next)
     {
         if (!CurrUser::IsLogged()) {
             return redirect()->route('login.index');

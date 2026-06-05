@@ -7,38 +7,43 @@ use App\Http\Controllers\WorkersController;
 
 Route::view('/layout-test', 'components.layout');
 
+// This is quite dumb but laravel doesn't like when create is in Route middleware for admin
+// Throws error 404 if in that middleware so it has to be above
+// Explicitly assigning middleware to each route with correct order may work but this will do for now
+
+Route::get('workers/create', [WorkersController::class, 'create'])
+    ->middleware('admin.worker')
+    ->name('workers.create');
 
 Route::middleware('worker')->group(function () {
-    Route::get('/workers', [WorkersController::class, 'index'])
+    Route::get('workers', [WorkersController::class, 'index'])
         ->name('workers.index');
 
-    Route::get('/workers/{worker}', [WorkersController::class, 'show'])
+    Route::get('workers/{worker}', [WorkersController::class, 'show'])
         ->name('workers.show');
 });
 
 Route::middleware('admin.worker')->group(function () {
-    Route::get('/workers/create', [WorkersController::class, 'create'])
-        ->name('workers.create');
 
-    Route::post('/workers', [WorkersController::class, 'store'])
+    Route::post('workers', [WorkersController::class, 'store'])
         ->name('workers.store');
 
-    Route::get('/workers/{worker}/edit', [WorkersController::class, 'edit'])
+    Route::get('workers/{worker}/edit', [WorkersController::class, 'edit'])
         ->name('workers.edit');
 
-    Route::put('/workers/{worker}', [WorkersController::class, 'update'])
+    Route::put('workers/{worker}', [WorkersController::class, 'update'])
         ->name('workers.update');
 
-    Route::delete('/workers/{worker}', [WorkersController::class, 'destroy'])
+    Route::delete('workers/{worker}', [WorkersController::class, 'destroy'])
         ->name('workers.destroy');
 
-    Route::patch('/workers/{worker}/block', [WorkersController::class, 'block'])
+    Route::patch('workers/{worker}/block', [WorkersController::class, 'block'])
         ->name('workers.block');
 
-    Route::patch('/workers/{worker}/unblock', [WorkersController::class, 'unblock'])
+    Route::patch('workers/{worker}/unblock', [WorkersController::class, 'unblock'])
         ->name('workers.unblock');
 
-    Route::post('/workers/{worker}/reset-password', [WorkersController::class, 'resetPassword'])
+    Route::post('workers/{worker}/reset-password', [WorkersController::class, 'resetPassword'])
         ->name('workers.reset-password');
 });
 
