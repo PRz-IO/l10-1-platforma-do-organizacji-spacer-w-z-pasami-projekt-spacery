@@ -19,6 +19,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        if (config('app.env') === 'production' || env('AZURE_REWRITTEN_HOST')) {
+            URL::forceScheme('https');
+        }
     }
 }
