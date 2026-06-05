@@ -29,7 +29,7 @@
             \App\Utilities\CurrUser::getRole()=="Worker" &&
             \App\Utilities\CurrUser::getAcc_State() !="Pending" &&
             \App\Utilities\CurrUser::getParam() ==True)
-                 href="{{ '#' }}"    
+                 href="{{ route('workers.index') }}"    
             @else
                 href="#" class="nav-dummy"
             @endif

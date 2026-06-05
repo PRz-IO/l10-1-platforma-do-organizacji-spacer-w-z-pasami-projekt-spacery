@@ -51,7 +51,11 @@ actually create showing single worker info
                 {{ $state }}
             </span>
         </h3>
-        @if(auth()->user()?->worker?->Is_Admin)
+        @if(\App\Utilities\CurrUser::IsLogged() && 
+            \App\Utilities\CurrUser::getRole()=="Worker" &&
+            \App\Utilities\CurrUser::getAcc_State() !="Pending" &&
+            \App\Utilities\CurrUser::getParam() ==True
+        )
             <p><strong>Login:</strong> {{ $worker->account?->Login }}</p>
         @endif
         <p><strong>Email:</strong> {{ $worker->account?->Email }}</p>
@@ -70,7 +74,11 @@ actually create showing single worker info
         gap:8px;
     ">
 
-        @if(auth()->user()?->worker?->Is_Admin)
+        @if(\App\Utilities\CurrUser::IsLogged() && 
+            \App\Utilities\CurrUser::getRole()=="Worker" &&
+            \App\Utilities\CurrUser::getAcc_State() !="Pending" &&
+            \App\Utilities\CurrUser::getParam() ==True
+        )
 
             <a href="{{ route('workers.edit', $worker->getKey()) }}">
                 <button type="button">
@@ -200,8 +208,8 @@ actually create showing single worker info
 
                 <div style="margin-top:8px;">
                     <!-- UNCOMMENT ONCE schedules.show exists -->
-                    <a href="{{ route('schedules.show', $schedule->id) }}">
-                    {{-- <a href=""> --}}
+                    {{-- <a href="{{ route('walks.show', $schedule->id) }}"> --}}
+                    <a href="">
                         <button style="padding:4px 8px; font-size:12px;">
                             Szczegóły
                         </button>
