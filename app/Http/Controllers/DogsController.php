@@ -156,7 +156,12 @@ private function uploadPhoto($request, $existingPhoto = null): string
             ->where('volunteer_id', $volunteerId)
             ->orderBy('Date', 'desc')
             ->orderBy('Time', 'desc')
-            ->get();
+            ->get()
+            ->map(function ($walk) {
+                $walk->datetime = \Carbon\Carbon::parse($walk->Date . ' ' . $walk->Time);
+                 $walk->can_note = $walk->datetime->greaterThan(now()->subHours(72)) &&
+                          $walk->datetime->lessThanOrEqualTo(now());
+                return $walk;});
     }
 
     else {
@@ -188,6 +193,13 @@ public function reserveWalk(Request $request, $id)
         return redirect()->back()
             ->with('error', 'Ten termin jest już zajęty.');
     }
+
+    $walkDateTime = \Carbon\Carbon::parse($request->walk_date . ' ' . $request->walk_time);
+
+    if ($walkDateTime->lessThanOrEqualTo(now())) {
+    return redirect()->back()
+        ->with('error', 'Termin niedostępny');
+}
 
     DB::table('schedules')->insert([
         'Date' => $request->walk_date,

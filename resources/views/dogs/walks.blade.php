@@ -62,14 +62,10 @@
                         <div style="display:flex;flex-direction:column;gap:4px;">
                             <div><strong>Data:</strong> {{ $walk->Date }}</div>
                             <div><strong>Godzina:</strong> {{ $walk->Time }}</div>
-                            <div><strong>Notatka:</strong> {{ $walk->Note ?? '-' }}</div>
-                        </div>
+                            </div>
 
                         <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px;">
 
-                            <div style="color:#999;font-size:14px;">
-                                Zaplanowany
-                            </div>
 
                             @if(\App\Utilities\CurrUser::IsLogged()
                                 && \App\Utilities\CurrUser::getRole() === 'Volunteer')
@@ -140,6 +136,11 @@
 
                 @foreach($past as $walk)
 
+                    @php
+                        $walkDateTime = \Carbon\Carbon::parse($walk->Date . ' ' . $walk->Time);
+                        $canAddNote = $walkDateTime->greaterThanOrEqualTo(now()->subHours(72));
+                    @endphp
+
                     <div style="
                         display:flex;
                         justify-content:space-between;
@@ -158,9 +159,88 @@
                             <div><strong>Ocena:</strong> {{ $walk->Grade ?? '-' }}</div>
                         </div>
 
-                        <div style="color:#777;font-size:14px;">
-                            Zakończony
+                        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px;">
+
+                            @if($canAddNote && \App\Utilities\CurrUser::IsLogged()
+                                && \App\Utilities\CurrUser::getRole() === 'Volunteer')
+
+                                <form method="POST"
+                                      action="{{ route('walks.addNote', $walk->id) }}"
+                                      style="display:flex;gap:5px;align-items:center;">
+
+                                    @csrf
+
+                                    <input type="text"
+                                           name="note"
+                                           placeholder="Dodaj notatkę"
+                                           style="
+                                               padding:6px;
+                                               border:1px solid #ccc;
+                                               border-radius:6px;
+                                               font-size:13px;
+                                           ">
+
+                                    <button type="submit"
+                                            style="
+                                                background:#28a745;
+                                                color:white;
+                                                border:none;
+                                                padding:6px 10px;
+                                                border-radius:6px;
+                                                cursor:pointer;
+                                                font-size:13px;
+                                            ">
+                                        Zapisz
+                                    </button>
+
+                                </form>
+
+                            @endif
+
+
+                            @if(\App\Utilities\CurrUser::IsLogged()
+                                && \App\Utilities\CurrUser::getRole() === 'Worker'
+                                && is_null($walk->Grade))
+
+                                <form method="POST"
+                                    action="{{ route('walks.addGrade', $walk->id) }}"
+                                    style="display:flex;gap:5px;align-items:center;">
+
+                                    @csrf
+
+                                    <select name="grade"
+                                            style="
+                                                padding:6px;
+                                                border:1px solid #ccc;
+                                                border-radius:6px;
+                                                font-size:13px;
+                                            ">
+                                        <option value="1">1</option>
+                                        <option value="2">2</option>
+                                        <option value="3">3</option>
+                                        <option value="4">4</option>
+                                        <option value="5">5</option>
+                                    </select>
+
+                                    <button type="submit"
+                                            style="
+                                                background:#ffc107;
+                                                color:#000;
+                                                border:none;
+                                                padding:6px 10px;
+                                                border-radius:6px;
+                                                cursor:pointer;
+                                                font-size:13px;
+                                            ">
+                                        Oceń
+                                    </button>
+
+                                </form>
+
+                            @endif
+
                         </div>
+
 
                     </div>
 
@@ -183,9 +263,10 @@
             ">
 
                 <h4 style="
-                    margin:0 0 15px 0;
-                    color:#555;
-                    font-weight:600;
+                    margin:0 0 20px 0;
+                    color:#000;
+                    font-size:22px;
+                    font-weight:700;
                 ">
                     Zarezerwuj nowy spacer
                 </h4>
@@ -197,7 +278,7 @@
 
                     <div style="margin-bottom:15px;">
 
-                        <label style="display:block;margin-bottom:5px;">
+                        <label style="display:block;margin-bottom:5px;color:#555;font-size:15px;">
                             Data spaceru
                         </label>
 
@@ -216,7 +297,7 @@
 
                     <div style="margin-bottom:15px;">
 
-                        <label style="display:block;margin-bottom:5px;">
+                        <label style="display:block;margin-bottom:5px;color:#555;font-size:15px;">
                             Godzina spaceru
                         </label>
 
