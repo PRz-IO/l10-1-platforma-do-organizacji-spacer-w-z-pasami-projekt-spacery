@@ -176,41 +176,30 @@
 
                         <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px;">
 
-                            @if($canEditNote && \App\Utilities\CurrUser::IsLogged()
-                                && \App\Utilities\CurrUser::getRole() === 'Volunteer')
+                             @if(!$hasNote
+                        && $canEdit
+                        && \App\Utilities\CurrUser::IsLogged()
+                        && \App\Utilities\CurrUser::getRole() === 'Volunteer')
 
-                                <form method="POST"
-                                      action="{{ route('dogs.walks.note', $walk->id) }}"
-                                      style="display:flex;gap:5px;align-items:center;">
+                        <form method="POST"
+                              action="{{ route('dogs.walks.note', $walk->id) }}"
+                              style="display:flex;gap:5px;align-items:center;">
 
-                                    @csrf
+                            @csrf
 
-                                    <input type="text"
-                                           name="note"
-                                           placeholder="Dodaj notatkę"
-                                           style="
-                                               padding:6px;
-                                               border:1px solid #ccc;
-                                               border-radius:6px;
-                                               font-size:13px;
-                                           ">
+                            <input type="text"
+                                   name="note"
+                                   placeholder="Dodaj notatkę"
+                                   style="padding:6px;border:1px solid #ccc;border-radius:6px;font-size:13px;">
 
-                                    <button type="submit"
-                                            style="
-                                                background:#28a745;
-                                                color:white;
-                                                border:none;
-                                                padding:6px 10px;
-                                                border-radius:6px;
-                                                cursor:pointer;
-                                                font-size:13px;
-                                            ">
-                                        Zapisz
-                                    </button>
+                            <button type="submit"
+                                    style="background:#28a745;color:white;border:none;padding:6px 10px;border-radius:6px;cursor:pointer;font-size:13px;">
+                                Zapisz
+                            </button>
 
-                                </form>
+                        </form>
 
-                            @endif
+                    @endif
 
 
                             @if(\App\Utilities\CurrUser::IsLogged() && \App\Utilities\CurrUser::getRole() === 'Worker')
