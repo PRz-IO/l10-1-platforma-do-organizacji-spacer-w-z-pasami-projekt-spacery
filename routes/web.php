@@ -87,6 +87,9 @@ Route::get('/dogs/{id}', [DogsController::class, 'show']);
 Route::get('/dogs/{id}/edit', [DogsController::class, 'edit']);
 Route::put('/dogs/{id}', [DogsController::class, 'update']);
 Route::get('/dogs/{id}/walks', [DogsController::class, 'walks']);
+Route::post('/dogs/{id}/walks',[DogsController::class, 'reserveWalk'])->name('dogs.walks.reserve');
+Route::delete('/dogs/walks/{scheduleId}',[DogsController::class, 'cancelWalk'])->name('dogs.walks.cancel');
+
 
 Route::post('/dogs/{id}/favorite', [DogsController::class, 'toggleFavorite']);
 
