@@ -4,6 +4,7 @@ use App\Http\Controllers\LoginController;
 use App\Http\Controllers\SignupController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\WorkersController;
+use App\Http\Controllers\ProfilesController;
 
 Route::view('/layout-test', 'components.layout');
 
@@ -86,11 +87,15 @@ Route::post('/dogs', [DogsController::class, 'store']);
 Route::get('/dogs/{id}', [DogsController::class, 'show']);
 Route::get('/dogs/{id}/edit', [DogsController::class, 'edit']);
 Route::put('/dogs/{id}', [DogsController::class, 'update']);
+
+//spacery dla psów
 Route::get('/dogs/{id}/walks', [DogsController::class, 'walks']);
 Route::post('/dogs/{id}/walks',[DogsController::class, 'reserveWalk'])->name('dogs.walks.reserve');
 Route::delete('/dogs/walks/{scheduleId}',[DogsController::class, 'cancelWalk'])->name('dogs.walks.cancel');
-
-
+//notatki i oceny spacerów dla psów
+Route::post('/dogs/walks/{id}/note', [DogsController::class, 'addNote'])->name('dogs.walks.note');
+Route::post('/dogs/walks/{id}/grade', [DogsController::class, 'addGrade'])->name('dogs.walks.grade');
+//ulubione pasy
 Route::post('/dogs/{id}/favorite', [DogsController::class, 'toggleFavorite']);
 
 
@@ -122,3 +127,7 @@ Route::post('/spacery/{schedule_id}/notatka', [WalksController::class, 'addNote'
 Route::post('/spacery/{schedule_id}/ocena', [WalksController::class, 'addGrade'])->name('walks.addGrade');
 
 Route::delete('/spacery/{schedule_id}/anuluj', [WalksController::class, 'cancelWalk'])->name('walks.cancel');
+
+
+//profil
+Route::get('/profile', [ProfilesController::class, 'profile_type'])->name('profile');

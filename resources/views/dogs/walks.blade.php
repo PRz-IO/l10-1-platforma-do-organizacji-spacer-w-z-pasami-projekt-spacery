@@ -165,7 +165,7 @@
                                 && \App\Utilities\CurrUser::getRole() === 'Volunteer')
 
                                 <form method="POST"
-                                      action="{{ route('walks.addNote', $walk->id) }}"
+                                      action="{{ route('dogs.walks.note', $walk->id) }}"
                                       style="display:flex;gap:5px;align-items:center;">
 
                                     @csrf
@@ -203,7 +203,7 @@
                                 && is_null($walk->Grade))
 
                                 <form method="POST"
-                                    action="{{ route('walks.addGrade', $walk->id) }}"
+                                    action="{{ route('dogs.walks.grade', $walk->id) }}"
                                     style="display:flex;gap:5px;align-items:center;">
 
                                     @csrf
