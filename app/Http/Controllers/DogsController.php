@@ -12,6 +12,19 @@ use App\Models\Volunteer;
 
 class DogsController extends Controller
 {
+
+private function getVolunteerId(): ?int
+{
+    if (!CurrUser::IsLogged() || CurrUser::getRole() !== 'Volunteer') {
+        return null;
+    }
+
+    $volunteer = Volunteer::where('account_id', CurrUser::getId())->first();
+
+    return $volunteer?->id;
+}
+
+
     public function index()
 {
     $dogs = Dog::all();
@@ -128,16 +141,11 @@ class DogsController extends Controller
             return redirect('/dogs');
         }
 
-        $volunteer = Volunteer::where(
-        'account_id',
-        CurrUser::getId()
-        )->first();
+        $volunteerId = $this->getVolunteerId();
 
-        if (!$volunteer) {
-        return redirect('/dogs');
+        if (!$volunteerId) {
+            return redirect('/dogs');
         }
-
-$volunteerId = $volunteer->id;
 
         $existing = Fav_Dog::where('dog_id', $id)
             ->where('volunteer_id', $volunteerId)
@@ -146,8 +154,7 @@ $volunteerId = $volunteer->id;
         if ($existing) {
             $existing->delete();
 
-            return redirect('/dogs')
-                ->with('favorite_removed', true);
+            return redirect()->back()->with('favorite_removed', true);
         }
 
         Fav_Dog::create([
@@ -155,7 +162,6 @@ $volunteerId = $volunteer->id;
             'volunteer_id' => $volunteerId
         ]);
 
-        return redirect('/dogs')
-            ->with('favorite_added', true);
+        return redirect()->back()->with('favorite_added', true);
     }
 }
