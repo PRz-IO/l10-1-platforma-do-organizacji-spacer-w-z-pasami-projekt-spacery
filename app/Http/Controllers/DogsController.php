@@ -250,7 +250,40 @@ public function cancelWalk($scheduleId)
         ->with('success', 'Anulowano spacer');
 }
 
+////notatki i oceny do spaceru
 
+public function addNote(Request $request, $id)
+{
+    $volunteerId = $this->getVolunteerId();
+
+    if (!$volunteerId) {
+        return redirect('/login');
+    }
+
+    DB::table('schedules')
+        ->where('id', $id)
+        ->where('volunteer_id', $volunteerId)
+        ->update([
+            'Note' => $request->input('note')
+        ]);
+
+    return redirect()->back()->with('success', 'Dodano notatkę');
+}
+
+public function addGrade(Request $request, $id)
+{
+    if (!CurrUser::IsLogged() || CurrUser::getRole() !== 'Worker') {
+        return redirect()->back();
+    }
+
+    DB::table('schedules')
+        ->where('id', $id)
+        ->update([
+            'Grade' => $request->input('grade')
+        ]);
+
+    return redirect()->back()->with('success', 'Dodano ocenę');
+}
 
 
 
