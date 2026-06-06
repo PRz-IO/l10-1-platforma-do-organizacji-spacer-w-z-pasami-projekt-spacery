@@ -12,7 +12,7 @@
             @endif
         </div>
 
-        {{-- KOMUNIKATY --}}
+
         @if(session('favorite_added'))
             <div style="background:#d4edda;color:#155724;padding:10px 15px;border-radius:6px;margin-bottom:15px;border:1px solid #c3e6cb;">
                 Dodano psa do ulubionych
@@ -30,7 +30,7 @@
             <p>Brak psów w bazie</p>
         @else
 
-            {{-- ULUBIONE --}}
+
             @if(count($favoriteDogs ?? []) > 0)
 
                 @foreach($favoriteDogs as $dog)
@@ -80,7 +80,7 @@
 
                 @endforeach
 
-                {{-- SEPARATOR --}}
+
                 @if(count($otherDogs ?? []) > 0)
                 <div style="margin:25px 0;border-top:2px solid #e0e0e0;"></div>
                 @endif
@@ -88,7 +88,7 @@
             @endif
 
 
-            {{-- RESZTA PSÓW --}}
+
             @foreach($otherDogs as $dog)
 
                 @php
