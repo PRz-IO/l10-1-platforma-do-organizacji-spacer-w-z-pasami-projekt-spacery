@@ -6,13 +6,21 @@
 
             <div style="display:flex;gap:10px;align-items:center;">
 
-                {{-- ULUBIONE (Volunteer) --}}
                 @if(\App\Utilities\CurrUser::IsLogged() && \App\Utilities\CurrUser::getRole() === 'Volunteer')
 
                     @php
-                        $isFav = \App\Models\Fav_Dog::where('dog_id', $dog->id)
-                            ->where('volunteer_id', \App\Utilities\CurrUser::getId())
-                            ->exists();
+                        $volunteerId = \App\Models\Volunteer::where(
+                            'account_id',
+                            \App\Utilities\CurrUser::getId()
+                        )->first()?->id;
+
+                        $isFav = false;
+
+                        if ($volunteerId) {
+                            $isFav = \App\Models\Fav_Dog::where('dog_id', $dog->id)
+                                ->where('volunteer_id', $volunteerId)
+                                ->exists();
+                        }
                     @endphp
 
                     <form method="POST" action="/dogs/{{ $dog->id }}/favorite">
@@ -33,7 +41,7 @@
 
                 @endif
 
-                {{-- EDYCJA (Worker) --}}
+
                 @if(\App\Utilities\CurrUser::IsLogged() && \App\Utilities\CurrUser::getRole() === 'Worker')
                     <a href="/dogs/{{ $dog->id }}/edit"
                        style="border:1px solid #ddd;padding:6px 10px;border-radius:6px;text-decoration:none;color:#333;">
@@ -51,7 +59,6 @@
 
         <div style="display:flex;gap:25px;align-items:flex-start;">
 
-            {{-- ZDJĘCIE --}}
             <div style="
                 width:220px;
                 height:220px;
@@ -66,8 +73,8 @@
                      style="width:100%;height:100%;object-fit:cover;">
             </div>
 
-            {{-- INFO --}}
-            <div style="display:flex;flex-direction:column;gap:12px;">
+
+            <div style="display:flex;flex-direction:column;gap:12px;text-align:left;">
 
                 <div style="font-size:16px;">
                     <strong>Imię:</strong> {{ $dog->Name }}
@@ -81,7 +88,11 @@
                     <strong>Stan:</strong> {{ \App\Utilities\DogState::label($dog->State) }}
                 </div>
 
-                <div style="max-width:500px;font-size:16px;">
+                <div style="
+                    max-width:500px;
+                    font-size:16px;
+                    text-align:justify;
+                ">
                     <strong>Zachowanie:</strong><br>
                     {{ $dog->Behaviour }}
                 </div>
