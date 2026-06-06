@@ -176,7 +176,7 @@
 
                         <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px;">
 
-                            @if($canAddNote && \App\Utilities\CurrUser::IsLogged()
+                            @if($canEditNote && \App\Utilities\CurrUser::IsLogged()
                                 && \App\Utilities\CurrUser::getRole() === 'Volunteer')
 
                                 <form method="POST"
