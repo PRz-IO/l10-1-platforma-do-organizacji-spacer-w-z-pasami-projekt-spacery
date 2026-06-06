@@ -144,7 +144,8 @@
 
                     @php
                         $walkDateTime = \Carbon\Carbon::parse($walk->Date . ' ' . $walk->Time);
-                        $canAddNote = $walkDateTime->greaterThanOrEqualTo(now()->subHours(72));
+                        $canEditNote = $walkDateTime->greaterThanOrEqualTo(now()->subHours(72));
+                        $hasNote = !is_null($walk->Note);
                     @endphp
 
                     <div style="
@@ -212,44 +213,77 @@
                             @endif
 
 
-                            @if(\App\Utilities\CurrUser::IsLogged()
-                                && \App\Utilities\CurrUser::getRole() === 'Worker'
-                                && is_null($walk->Grade))
+                            @if(\App\Utilities\CurrUser::IsLogged() && \App\Utilities\CurrUser::getRole() === 'Volunteer' && $canEditNote)
 
-                                <form method="POST"
-                                    action="{{ route('dogs.walks.grade', $walk->id) }}"
-                                    style="display:flex;gap:5px;align-items:center;">
+                                    @if($hasNote)
 
-                                    @csrf
+                                        <form method="POST"
+                                            action="{{ route('dogs.walks.grade', $walk->id) }}"
+                                            style="display:flex;gap:5px;align-items:center;">
 
-                                    <select name="grade"
-                                            style="
-                                                padding:6px;
-                                                border:1px solid #ccc;
-                                                border-radius:6px;
-                                                font-size:13px;
-                                            ">
-                                        <option value="1">1</option>
-                                        <option value="2">2</option>
-                                        <option value="3">3</option>
-                                        <option value="4">4</option>
-                                        <option value="5">5</option>
-                                    </select>
+                                            @csrf
 
-                                    <button type="submit"
-                                            style="
-                                                background:#ffc107;
-                                                color:#000;
-                                                border:none;
-                                                padding:6px 10px;
-                                                border-radius:6px;
-                                                cursor:pointer;
-                                                font-size:13px;
-                                            ">
-                                        Oceń
-                                    </button>
+                                            <select name="grade"
+                                                    style="
+                                                        padding:6px;
+                                                        border:1px solid #ccc;
+                                                        border-radius:6px;
+                                                        font-size:13px;
+                                                    ">
+                                                <option value="1">1</option>
+                                                <option value="2">2</option>
+                                                <option value="3">3</option>
+                                                <option value="4">4</option>
+                                                <option value="5">5</option>
+                                            </select>
 
-                                </form>
+                                            <button type="submit"
+                                                    style="
+                                                        background:#ffc107;
+                                                        color:#000;
+                                                        border:none;
+                                                        padding:6px 10px;
+                                                        border-radius:6px;
+                                                        cursor:pointer;
+                                                        font-size:13px;
+                                                    ">
+                                                Oceń
+                                            </button>
+
+                                        </form>
+                                    @else
+                                        <form method="POST"
+                                            action="{{ route('dogs.walks.note', $walk->id) }}"
+                                            style="display:flex;gap:5px;align-items:center;">
+
+                                            @csrf
+
+                                            <input type="text"
+                                                name="note"
+                                                placeholder="Dodaj notatkę"
+                                                style="
+                                                    padding:6px;
+                                                    border:1px solid #ccc;
+                                                    border-radius:6px;
+                                                    font-size:13px;
+                                                ">
+
+                                            <button type="submit"
+                                                    style="
+                                                        background:#28a745;
+                                                        color:white;
+                                                        border:none;
+                                                        padding:6px 10px;
+                                                        border-radius:6px;
+                                                        cursor:pointer;
+                                                        font-size:13px;
+                                                    ">
+                                                Zapisz
+                                            </button>
+
+                                        </form>
+
+                                    @endif
 
                             @endif
 
