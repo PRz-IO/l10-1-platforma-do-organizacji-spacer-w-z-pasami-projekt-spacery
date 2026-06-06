@@ -25,6 +25,22 @@ private function getVolunteerId(): ?int
 }
 
 
+private function uploadPhoto($request, $existingPhoto = null): string
+{
+    if ($request->hasFile('Photo')) {
+        $file = $request->file('Photo');
+        $path = $file->store('dogs', 'public');
+        return '/storage/' . $path;
+    }
+
+    if ($existingPhoto) {
+        return $existingPhoto;
+    }
+
+    return asset('images/default_dog.png');
+}
+
+
     public function index()
 {
     $dogs = Dog::all();
@@ -76,17 +92,7 @@ private function getVolunteerId(): ?int
         'State'
     ]);
 
-    if ($request->hasFile('Photo')) {
-
-        $file = $request->file('Photo');
-
-        $path = $file->store('dogs', 'public');
-
-        $data['Photo'] = '/storage/' . $path;
-
-    } else {
-        $data['Photo'] = null; 
-    }
+    $data['Photo'] = $this->uploadPhoto($request);
 
 
         Dog::create($data);
@@ -104,25 +110,14 @@ private function getVolunteerId(): ?int
     {
         $dog = Dog::findOrFail($id);
 
-        $dog->update([
-            'Name' => $request->input('Name'),
-            'Age' => $request->input('Age'),
-            'Behaviour' => $request->input('Behaviour'),
-            'State' => $request->input('State'),
-            'Photo' => $request->input('Photo'),
-        ]);
+         $data = $request->only([
+        'Name',
+        'Age',
+        'Behaviour',
+        'State'
+    ]);
 
-        if ($request->hasFile('Photo')) {
-
-        $file = $request->file('Photo');
-        $filename = time() . '_' . $file->getClientOriginalName();
-
-        $path = $file->store('dogs', 'public');
-
-        $data['Photo'] = '/storage/' . $path;
-
-        } 
-
+        $data['Photo'] = $this->uploadPhoto($request, $dog->Photo);
         $dog->update($data);
 
         return redirect('/dogs/' . $id);

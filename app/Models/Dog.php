@@ -33,18 +33,9 @@ class Dog extends Model
     public function getPhotoAttribute($value)
     {
         if (empty($value)) {
-            return asset('images/default_dog.png');
+        return asset('images/default_dog.png');
         }
-
-        if (str_starts_with($value, '/')) {
-        $path = public_path($value);
-
-        if (!File::exists($path)) {
-            return asset('images/default_dog.png');
-        }
-    }
 
         return $value;
     }
-
 }
