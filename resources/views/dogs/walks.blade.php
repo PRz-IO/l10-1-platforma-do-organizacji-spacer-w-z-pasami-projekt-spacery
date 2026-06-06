@@ -144,8 +144,7 @@
 
                     @php
                         $walkDateTime = \Carbon\Carbon::parse($walk->Date . ' ' . $walk->Time);
-                        $canEditNote = $walkDateTime->greaterThanOrEqualTo(now()->subHours(72));
-                        $hasNote = !is_null($walk->Note);
+                        $canAddNote = $walkDateTime->greaterThanOrEqualTo(now()->subHours(72));
                     @endphp
 
                     <div style="
@@ -176,103 +175,80 @@
 
                         <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px;">
 
-                             @if(!$hasNote
-                        && $canEdit
-                        && \App\Utilities\CurrUser::IsLogged()
-                        && \App\Utilities\CurrUser::getRole() === 'Volunteer')
+                            @if($canAddNote && \App\Utilities\CurrUser::IsLogged() && \App\Utilities\CurrUser::getRole() === 'Volunteer' && empty($walk->Note))
 
-                        <form method="POST"
-                              action="{{ route('dogs.walks.note', $walk->id) }}"
-                              style="display:flex;gap:5px;align-items:center;">
+                                <form method="POST"
+                                      action="{{ route('dogs.walks.note', $walk->id) }}"
+                                      style="display:flex;gap:5px;align-items:center;">
 
-                            @csrf
+                                    @csrf
 
-                            <input type="text"
-                                   name="note"
-                                   placeholder="Dodaj notatkę"
-                                   style="padding:6px;border:1px solid #ccc;border-radius:6px;font-size:13px;">
+                                    <input type="text"
+                                           name="note"
+                                           placeholder="Dodaj notatkę"
+                                           style="
+                                               padding:6px;
+                                               border:1px solid #ccc;
+                                               border-radius:6px;
+                                               font-size:13px;
+                                           ">
 
-                            <button type="submit"
-                                    style="background:#28a745;color:white;border:none;padding:6px 10px;border-radius:6px;cursor:pointer;font-size:13px;">
-                                Zapisz
-                            </button>
+                                    <button type="submit"
+                                            style="
+                                                background:#28a745;
+                                                color:white;
+                                                border:none;
+                                                padding:6px 10px;
+                                                border-radius:6px;
+                                                cursor:pointer;
+                                                font-size:13px;
+                                            ">
+                                        Zapisz
+                                    </button>
 
-                        </form>
+                                </form>
 
-                    @endif
+                            @endif
 
 
-                            @if(\App\Utilities\CurrUser::IsLogged() && \App\Utilities\CurrUser::getRole() === 'Worker')
+                            @if(\App\Utilities\CurrUser::IsLogged()
+                                && \App\Utilities\CurrUser::getRole() === 'Worker'
+                                && is_null($walk->Grade))
 
-                                    @if($hasNote)
+                                <form method="POST"
+                                    action="{{ route('dogs.walks.grade', $walk->id) }}"
+                                    style="display:flex;gap:5px;align-items:center;">
 
-                                        <form method="POST"
-                                            action="{{ route('dogs.walks.grade', $walk->id) }}"
-                                            style="display:flex;gap:5px;align-items:center;">
+                                    @csrf
 
-                                            @csrf
+                                    <select name="grade"
+                                            style="
+                                                padding:6px;
+                                                border:1px solid #ccc;
+                                                border-radius:6px;
+                                                font-size:13px;
+                                            ">
+                                        <option value="1">1</option>
+                                        <option value="2">2</option>
+                                        <option value="3">3</option>
+                                        <option value="4">4</option>
+                                        <option value="5">5</option>
+                                    </select>
 
-                                            <select name="grade"
-                                                    style="
-                                                        padding:6px;
-                                                        border:1px solid #ccc;
-                                                        border-radius:6px;
-                                                        font-size:13px;
-                                                    ">
-                                                <option value="1">1</option>
-                                                <option value="2">2</option>
-                                                <option value="3">3</option>
-                                                <option value="4">4</option>
-                                                <option value="5">5</option>
-                                            </select>
+                                    <button type="submit"
+                                            style="
+                                                background:#ffc107;
+                                                color:#000;
+                                                border:none;
+                                                padding:6px 10px;
+                                                border-radius:6px;
+                                                cursor:pointer;
+                                                font-size:13px;
+                                            ">
+                                        Oceń
+                                    </button>
 
-                                            <button type="submit"
-                                                    style="
-                                                        background:#ffc107;
-                                                        color:#000;
-                                                        border:none;
-                                                        padding:6px 10px;
-                                                        border-radius:6px;
-                                                        cursor:pointer;
-                                                        font-size:13px;
-                                                    ">
-                                                Oceń
-                                            </button>
-
-                                        </form>
-                                    @else
-                                        <form method="POST"
-                                            action="{{ route('dogs.walks.note', $walk->id) }}"
-                                            style="display:flex;gap:5px;align-items:center;">
-
-                                            @csrf
-
-                                            <input type="text"
-                                                name="note"
-                                                placeholder="Dodaj notatkę"
-                                                style="
-                                                    padding:6px;
-                                                    border:1px solid #ccc;
-                                                    border-radius:6px;
-                                                    font-size:13px;
-                                                ">
-
-                                            <button type="submit"
-                                                    style="
-                                                        background:#28a745;
-                                                        color:white;
-                                                        border:none;
-                                                        padding:6px 10px;
-                                                        border-radius:6px;
-                                                        cursor:pointer;
-                                                        font-size:13px;
-                                                    ">
-                                                Zapisz
-                                            </button>
-
-                                        </form>
-
-                                    @endif
+                                </form>
 
                             @endif
 
