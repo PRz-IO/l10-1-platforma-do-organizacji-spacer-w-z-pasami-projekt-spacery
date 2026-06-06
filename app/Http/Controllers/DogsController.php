@@ -69,11 +69,14 @@ private function getVolunteerId(): ?int
 
     public function store(Request $request)
     {
-        $dto = DogDTO::fromRequest($request);
+         $data = $request->only([
+        'Name',
+        'Age',
+        'Behaviour',
+        'State'
+    ]);
 
-        Dog::create($dto->toArray());
-
-        if ($request->hasFile('Photo')) {
+    if ($request->hasFile('Photo')) {
 
         $file = $request->file('Photo');
 
@@ -81,7 +84,10 @@ private function getVolunteerId(): ?int
 
         $data['Photo'] = '/storage/' . $path;
 
+    } else {
+        $data['Photo'] = null; 
     }
+
 
         Dog::create($data);
         return redirect('/dogs');
@@ -109,11 +115,17 @@ private function getVolunteerId(): ?int
         if ($request->hasFile('Photo')) {
 
         $file = $request->file('Photo');
+        $filename = time() . '_' . $file->getClientOriginalName();
 
-        $path = $file->store('dogs', 'public');
+        $file->move(public_path('uploads/dogs'), $filename);
 
-        $data['Photo'] = '/storage/' . $path;
-    }
+        $data['Photo'] = '/uploads/dogs/' . $filename;
+
+        } 
+        
+        else {
+        $data['Photo'] = $dog->Photo;
+        }
 
         $dog->update($data);
 
