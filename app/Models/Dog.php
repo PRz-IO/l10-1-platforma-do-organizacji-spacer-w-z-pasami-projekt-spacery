@@ -40,7 +40,7 @@ class Dog extends Model
         $path = public_path($value);
 
         if (!File::exists($path)) {
-            return '/images/default_dog.png';
+            return asset('images/default_dog.png');
         }
     }
 

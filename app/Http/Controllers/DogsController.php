@@ -117,15 +117,11 @@ private function getVolunteerId(): ?int
         $file = $request->file('Photo');
         $filename = time() . '_' . $file->getClientOriginalName();
 
-        $file->move(public_path('uploads/dogs'), $filename);
+        $path = $file->store('dogs', 'public');
 
-        $data['Photo'] = '/uploads/dogs/' . $filename;
+        $data['Photo'] = '/storage/' . $path;
 
         } 
-        
-        else {
-        $data['Photo'] = $dog->Photo;
-        }
 
         $dog->update($data);
 
