@@ -8,23 +8,39 @@ use App\DTOs\DogDTO;
 use Illuminate\Http\Request;
 use App\Models\Fav_Dog;
 use App\Utilities\CurrUser;
+use App\Models\Volunteer;
 
 class DogsController extends Controller
 {
     public function index()
-    {
-        $dogs = Dog::all();
+{
+    $dogs = Dog::all();
 
-        $favDogIds = [];
+    $favDogIds = [];
 
-        if (CurrUser::IsLogged() && CurrUser::getRole() === 'Volunteer') {
-            $favDogIds = Fav_Dog::where('volunteer_id', CurrUser::getId())
+    if (CurrUser::IsLogged() && CurrUser::getRole() === 'Volunteer') {
+
+        $volunteer = Volunteer::where(
+            'account_id',
+            CurrUser::getId()
+        )->first();
+
+        if ($volunteer) {
+            $favDogIds = Fav_Dog::where('volunteer_id', $volunteer->id)
                 ->pluck('dog_id')
                 ->toArray();
         }
-
-        return view('dogs.index', compact('dogs', 'favDogIds'));
     }
+
+    $favoriteDogs = $dogs->whereIn('id', $favDogIds);
+    $otherDogs = $dogs->whereNotIn('id', $favDogIds);
+
+    return view('dogs.index', compact(
+        'favoriteDogs',
+        'otherDogs',
+        'favDogIds'
+    ));
+}
 
     public function show($id)
     {
@@ -112,7 +128,16 @@ class DogsController extends Controller
             return redirect('/dogs');
         }
 
-        $volunteerId = CurrUser::getId();
+        $volunteer = Volunteer::where(
+        'account_id',
+        CurrUser::getId()
+        )->first();
+
+        if (!$volunteer) {
+        return redirect('/dogs');
+        }
+
+$volunteerId = $volunteer->id;
 
         $existing = Fav_Dog::where('dog_id', $id)
             ->where('volunteer_id', $volunteerId)
