@@ -140,6 +140,9 @@ private function uploadPhoto($request, $existingPhoto = null): string
 
     if ($role === 'Worker') {
         $walks = \App\Models\Schedule::where('dog_id', $id)
+            ->join('volunteers', 'schedules.volunteer_id', '=', 'volunteers.id')
+            ->join('accounts', 'volunteers.account_id', '=', 'accounts.id')
+            ->select('schedules.*', 'accounts.Name as volunteer_name', 'accounts.Surname as volunteer_surname')
             ->orderBy('Date', 'desc')
             ->orderBy('Time', 'desc')
             ->get();

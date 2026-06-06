@@ -51,7 +51,7 @@
                     <div style="
                         display:flex;
                         justify-content:space-between;
-                        align-items:center;
+                        align-items:flex-start;
                         padding:12px 15px;
                         border:1px solid #e0e0e0;
                         border-radius:10px;
@@ -59,10 +59,16 @@
                         margin-bottom:10px;
                     ">
 
-                        <div style="display:flex;flex-direction:column;gap:4px;">
+                        <div style="display:flex;flex-direction:column;gap:4px;align-items:flex-start;text-align:left;">
+                            @if(\App\Utilities\CurrUser::getRole() === 'Worker')
+                                <div>
+                                    <strong>Wolontariusz:</strong>
+                                    {{ $walk->volunteer_name }} {{ $walk->volunteer_surname }}
+                                </div>
+                            @endif
                             <div><strong>Data:</strong> {{ $walk->Date }}</div>
                             <div><strong>Godzina:</strong> {{ $walk->Time }}</div>
-                            </div>
+                        </div>
 
                         <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px;">
 
@@ -144,7 +150,7 @@
                     <div style="
                         display:flex;
                         justify-content:space-between;
-                        align-items:center;
+                        align-items:flex-start;
                         padding:12px 15px;
                         border:1px solid #e0e0e0;
                         border-radius:10px;
@@ -152,11 +158,19 @@
                         margin-bottom:10px;
                     ">
 
-                        <div style="display:flex;flex-direction:column;gap:4px;">
+                        <div style="display:flex;flex-direction:column;gap:4px;align-items:flex-start;text-align:left;">
+                            @if(\App\Utilities\CurrUser::getRole() === 'Worker')
+                                <div>
+                                    <strong>Wolontariusz:</strong>
+                                    {{ $walk->volunteer_name }} {{ $walk->volunteer_surname }}
+                                </div>
+                            @endif
                             <div><strong>Data:</strong> {{ $walk->Date }}</div>
                             <div><strong>Godzina:</strong> {{ $walk->Time }}</div>
                             <div><strong>Notatka:</strong> {{ $walk->Note ?? '-' }}</div>
-                            <div><strong>Ocena:</strong> {{ $walk->Grade ?? '-' }}</div>
+                            @if(!is_null($walk->Grade))
+                            <div><strong>Ocena:</strong> {{ $walk->Grade }}</div>
+                            @endif
                         </div>
 
                         <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px;">
