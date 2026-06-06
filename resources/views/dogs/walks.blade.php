@@ -213,7 +213,7 @@
                             @endif
 
 
-                            @if(\App\Utilities\CurrUser::IsLogged() && \App\Utilities\CurrUser::getRole() === 'Volunteer' && $canEditNote)
+                            @if(\App\Utilities\CurrUser::IsLogged() && \App\Utilities\CurrUser::getRole() === 'Worker')
 
                                     @if($hasNote)
 
