@@ -8,9 +8,9 @@ class DogState
     {
         return match ($state) {
             'Ready' => 'Gotowy na spacer',
-            'Sick' => 'Chory',
-            'Difficult' => 'Trudny w obsłudze',
-            'Dead' => 'Nieaktywny',
+            'Sick' => 'Pod opieką weterynarza',
+            'Difficult' => 'Wymaga doświadczonej opieki',
+            'Dead' => 'Odszedł',
             default => $state,
         };
     }
