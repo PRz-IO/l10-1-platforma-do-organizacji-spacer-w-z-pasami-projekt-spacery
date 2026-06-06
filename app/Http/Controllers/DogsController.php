@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use App\Models\Fav_Dog;
 use App\Utilities\CurrUser;
 use App\Models\Volunteer;
+use App\Models\Account;
 use Illuminate\Support\Facades\DB;
 
 class DogsController extends Controller
@@ -140,12 +141,15 @@ private function uploadPhoto($request, $existingPhoto = null): string
 
     if ($role === 'Worker') {
         $walks = \App\Models\Schedule::where('dog_id', $id)
-            ->join('volunteers', 'schedules.volunteer_id', '=', 'volunteers.id')
-            ->join('accounts', 'volunteers.account_id', '=', 'accounts.id')
-            ->select('schedules.*', 'accounts.Name as volunteer_name', 'accounts.Surname as volunteer_surname')
-            ->orderBy('Date', 'desc')
-            ->orderBy('Time', 'desc')
-            ->get();
+        ->join('volunteers', 'schedules.volunteer_id', '=', 'volunteers.id')
+        ->join('accounts', 'volunteers.account_id', '=', 'accounts.id')
+        ->select(
+            'schedules.*',
+            'accounts.Name as volunteer_name',
+            'accounts.Last_Name as volunteer_surname')
+        ->orderBy('Date', 'desc')
+        ->orderBy('Time', 'desc')
+        ->get();
     }
 
     elseif ($role === 'Volunteer') {

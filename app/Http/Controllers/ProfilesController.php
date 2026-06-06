@@ -6,10 +6,13 @@ use Illuminate\Http\Request;
 use App\Models\Volunteer;
 use App\Models\Worker;
 use App\Utilities\CurrUser;
+use App\Models\Dog;
+use App\Models\Fav_Dog;
+
 
 class ProfilesController extends Controller
 {
-    public function profile_type()
+    public function show()
     {
         $role = CurrUser::getRole();
         $accountId = CurrUser::getId();
@@ -17,7 +20,12 @@ class ProfilesController extends Controller
         if ($role === 'Volunteer') {
             $profile = Volunteer::where('account_id', $accountId)->first();
 
-            return view('profiles.volunteer', compact('profile'));
+            $favDogIds = Fav_Dog::where('volunteer_id', $profile->id)
+                ->pluck('dog_id');
+
+            $favoriteDogs = Dog::whereIn('id', $favDogIds)->get();
+
+            return view('profiles.volunteer', compact('profile', 'favoriteDogs'));
         }
 
         if ($role === 'Worker') {

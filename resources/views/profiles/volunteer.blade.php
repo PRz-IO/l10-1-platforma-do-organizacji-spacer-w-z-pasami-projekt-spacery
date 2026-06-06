@@ -1,6 +1,6 @@
 <x-layout>
 
-    <div class="container">
+    <div class="container" style="display:block; text-align:left;">
 
         <h1 style="margin-bottom:20px;">
             Profil wolontariusza
@@ -14,35 +14,36 @@
     padding:20px;
     margin-bottom:20px;
     box-shadow:0 2px 6px rgba(0,0,0,0.05);
+    text-align:left;
 ">
 
     <h2 style="margin:0 0 15px 0;">
         Dane profilu
     </h2>
 
-    <div style="display:flex;flex-direction:column;gap:8px;">
+    <div style="display:flex;flex-direction:column;gap:8px;align-items:flex-start;text-align:left;">
 
-        <div>
+        <div style="display:flex;gap:8px;align-items:flex-start;">
             <strong>Imię i nazwisko:</strong>
             {{ $profile->account?->Name }} {{ $profile->account?->Last_Name }}
         </div>
 
-        <div>
+        <div style="display:flex;gap:8px;align-items:flex-start;">
             <strong>Email:</strong>
             {{ $profile->account?->Email }}
         </div>
 
-        <div>
+        <div style="display:flex;gap:8px;align-items:flex-start;">
             <strong>Telefon:</strong>
             {{ $profile->account?->Phone_Num ?? '-' }}
         </div>
 
-        <div>
+       <div style="display:flex;gap:8px;align-items:flex-start;">
             <strong>Login:</strong>
             {{ $profile->account?->Login }}
         </div>
 
-        <div>
+        <div style="display:flex;gap:8px;align-items:flex-start;">
             <strong>Doświadczenie:</strong>
             {{ $profile->Is_Experienced ? 'Tak' : 'Nie' }}
         </div>

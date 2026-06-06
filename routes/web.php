@@ -130,4 +130,4 @@ Route::delete('/spacery/{schedule_id}/anuluj', [WalksController::class, 'cancelW
 
 
 //profil
-Route::get('/profile', [ProfilesController::class, 'profile_type'])->name('profile');
+Route::get('/profile', [ProfilesController::class, 'show'])->name('profile');
