@@ -4,6 +4,8 @@
         <h1 style="margin-bottom:20px;">Dodaj psa</h1>
 
         <form method="POST" action="/dogs"
+
+            enctype="multipart/form-data"
               style="display:flex;flex-direction:column;gap:12px;">
 
             @csrf
@@ -35,7 +37,7 @@
 
             <div>
                 <label>Zdjęcie (URL)</label>
-                <input type="text" name="Photo" style="width:100%;padding:8px;">
+                <input type="file" name="Photo" accept="image/*">
             </div>
 
             <button type="submit"

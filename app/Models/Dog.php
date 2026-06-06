@@ -26,4 +26,16 @@ class Dog extends Model
     {
         return $this->hasMany(Schedule::class);
     }
+
+
+
+    public function getPhotoAttribute($value)
+    {
+        if (empty($value)) {
+            return '/images/default_dog.png';
+        }
+
+        return $value;
+    }
+
 }

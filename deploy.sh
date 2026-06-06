@@ -13,3 +13,7 @@ chmod -R 777 /home/site/wwwroot/bootstrap/cache
 php /home/site/wwwroot/artisan config:clear
 php /home/site/wwwroot/artisan cache:clear
 php /home/site/wwwroot/artisan view:clear
+
+if [ ! -L /home/site/wwwroot/public/storage ]; then
+    php /home/site/wwwroot/artisan storage:link
+fi

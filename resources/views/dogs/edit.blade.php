@@ -4,6 +4,7 @@
         <h1 style="margin-bottom:20px;">Edytuj psa</h1>
 
         <form method="POST" action="/dogs/{{ $dog->id }}"
+            enctype="multipart/form-data"
               style="display:flex;flex-direction:column;gap:12px;">
 
             @csrf
@@ -41,9 +42,7 @@
 
             <div>
                 <label>Zdjęcie (URL)</label>
-                <input type="text" name="Photo"
-                       value="{{ $dog->Photo }}"
-                       style="width:100%;padding:8px;">
+                <input type="file" name="Photo" accept="image/*">
             </div>
 
             <button type="submit"

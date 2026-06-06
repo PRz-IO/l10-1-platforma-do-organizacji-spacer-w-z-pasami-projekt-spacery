@@ -60,6 +60,17 @@ class DogsController extends Controller
 
         Dog::create($dto->toArray());
 
+        if ($request->hasFile('Photo')) {
+
+        $file = $request->file('Photo');
+
+        $path = $file->store('dogs', 'public');
+
+        $data['Photo'] = '/storage/' . $path;
+
+    }
+
+        Dog::create($data);
         return redirect('/dogs');
     }
 
@@ -81,6 +92,17 @@ class DogsController extends Controller
             'State' => $request->input('State'),
             'Photo' => $request->input('Photo'),
         ]);
+
+        if ($request->hasFile('Photo')) {
+
+        $file = $request->file('Photo');
+
+        $path = $file->store('dogs', 'public');
+
+        $data['Photo'] = '/storage/' . $path;
+    }
+
+        $dog->update($data);
 
         return redirect('/dogs/' . $id);
     }
