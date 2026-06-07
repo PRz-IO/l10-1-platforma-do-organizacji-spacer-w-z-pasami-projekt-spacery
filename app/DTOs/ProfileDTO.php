@@ -11,7 +11,7 @@ class ProfileDTO
     protected string $Email;
     protected string $Phone_Num;
     protected array $History;
-    /*
+
     public function __construct(
         string $Name,string $Last_Name,
         string $Login,string $Creation_Date,
@@ -24,7 +24,7 @@ class ProfileDTO
         $this->Creation_Date = $Creation_Date;
         $this->History = $History;
     }
-    */
+
     public function getName():string{
         return $this->Name;
     }
@@ -72,5 +72,15 @@ class ProfileDTO
     }
     public function setPhone_Num(string $Phone_Num){
         $this->Login = $Phone_Num;
+    }
+
+    public function toArray():array{
+        return [
+            'Name' => $this->Name,
+            'Last_Name' => $this->Last_Name,
+            'Login' => $this->Login,
+            'Creation_Date'=> $this->Creation_Date,
+            'History' => $this->History
+        ];
     }
 }
