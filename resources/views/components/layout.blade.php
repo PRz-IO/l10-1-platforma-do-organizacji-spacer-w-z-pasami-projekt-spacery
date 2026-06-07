@@ -27,9 +27,8 @@
             <a 
             @if (\App\Utilities\CurrUser::IsLogged() && 
             \App\Utilities\CurrUser::getRole()=="Worker" &&
-            \App\Utilities\CurrUser::getAcc_State() !="Pending" &&
-            \App\Utilities\CurrUser::getParam() ==True)
-                 href="{{ '#' }}"    
+            \App\Utilities\CurrUser::getAcc_State() =="Active")
+                 href="{{ route('workers.index') }}"    
             @else
                 href="#" class="nav-dummy"
             @endif
@@ -42,7 +41,7 @@
 
         @if (\App\Utilities\CurrUser::IsLogged())
         <div class="nav-links">    
-        <a href="#">Profil</a>
+        <a href="{{ route('profile') }}">Profil</a>
         </div>
         <div class="nav-links">    
         <a href="{{ route('login.logout') }}">Wyloguj</a>

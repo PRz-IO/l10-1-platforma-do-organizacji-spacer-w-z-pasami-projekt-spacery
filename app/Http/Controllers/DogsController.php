@@ -8,23 +8,70 @@ use App\DTOs\DogDTO;
 use Illuminate\Http\Request;
 use App\Models\Fav_Dog;
 use App\Utilities\CurrUser;
+use App\Models\Volunteer;
+use App\Models\Account;
+use Illuminate\Support\Facades\DB;
 
 class DogsController extends Controller
 {
+
+private function getVolunteerId(): ?int
+{
+    if (!CurrUser::IsLogged() || CurrUser::getRole() !== 'Volunteer') {
+        return null;
+    }
+
+    $volunteer = Volunteer::where('account_id', CurrUser::getId())->first();
+
+    return $volunteer?->id;
+}
+
+
+private function uploadPhoto($request, $existingPhoto = null): string
+{
+    if ($request->hasFile('Photo')) {
+        $file = $request->file('Photo');
+        $path = $file->store('dogs', 'public');
+        return '/storage/' . $path;
+    }
+
+    if ($existingPhoto) {
+        return $existingPhoto;
+    }
+
+    return asset('images/default_dog.png');
+}
+
+
     public function index()
-    {
-        $dogs = Dog::all();
+{
+    $dogs = Dog::all();
 
-        $favDogIds = [];
+    $favDogIds = [];
 
-        if (CurrUser::IsLogged() && CurrUser::getRole() === 'Volunteer') {
-            $favDogIds = Fav_Dog::where('volunteer_id', CurrUser::getId())
+    if (CurrUser::IsLogged() && CurrUser::getRole() === 'Volunteer') {
+
+        $volunteer = Volunteer::where(
+            'account_id',
+            CurrUser::getId()
+        )->first();
+
+        if ($volunteer) {
+            $favDogIds = Fav_Dog::where('volunteer_id', $volunteer->id)
                 ->pluck('dog_id')
                 ->toArray();
         }
-
-        return view('dogs.index', compact('dogs', 'favDogIds'));
     }
+
+    $favoriteDogs = $dogs->whereIn('id', $favDogIds);
+    $otherDogs = $dogs->whereNotIn('id', $favDogIds);
+
+    return view('dogs.index', compact(
+        'favoriteDogs',
+        'otherDogs',
+        'favDogIds'
+    ));
+}
 
     public function show($id)
     {
@@ -40,10 +87,17 @@ class DogsController extends Controller
 
     public function store(Request $request)
     {
-        $dto = DogDTO::fromRequest($request);
+         $data = $request->only([
+        'Name',
+        'Age',
+        'Behaviour',
+        'State'
+    ]);
 
-        Dog::create($dto->toArray());
+    $data['Photo'] = $this->uploadPhoto($request);
 
+
+        Dog::create($data);
         return redirect('/dogs');
     }
 
@@ -58,17 +112,22 @@ class DogsController extends Controller
     {
         $dog = Dog::findOrFail($id);
 
-        $dog->update([
-            'Name' => $request->input('Name'),
-            'Age' => $request->input('Age'),
-            'Behaviour' => $request->input('Behaviour'),
-            'State' => $request->input('State'),
-            'Photo' => $request->input('Photo'),
-        ]);
+         $data = $request->only([
+        'Name',
+        'Age',
+        'Behaviour',
+        'State'
+    ]);
+
+        $data['Photo'] = $this->uploadPhoto($request, $dog->Photo);
+        $dog->update($data);
 
         return redirect('/dogs/' . $id);
     }
 
+
+
+    // spacery
     public function walks($id)
 {
     if (!\App\Utilities\CurrUser::IsLogged()) {
@@ -78,21 +137,38 @@ class DogsController extends Controller
     $dog = \App\Models\Dog::findOrFail($id);
 
     $role = \App\Utilities\CurrUser::getRole();
-    $userId = \App\Utilities\CurrUser::getId();
+    
 
     if ($role === 'Worker') {
         $walks = \App\Models\Schedule::where('dog_id', $id)
-            ->orderBy('Date', 'desc')
-            ->orderBy('Time', 'desc')
-            ->get();
+        ->join('volunteers', 'schedules.volunteer_id', '=', 'volunteers.id')
+        ->join('accounts', 'volunteers.account_id', '=', 'accounts.id')
+        ->select(
+            'schedules.*',
+            'accounts.Name as volunteer_name',
+            'accounts.Last_Name as volunteer_surname')
+        ->orderBy('Date', 'desc')
+        ->orderBy('Time', 'desc')
+        ->get();
     }
 
     elseif ($role === 'Volunteer') {
+        $volunteerId = $this->getVolunteerId();
+
+        if (!$volunteerId) {
+            return redirect('/dogs');
+        }
+
         $walks = \App\Models\Schedule::where('dog_id', $id)
-            ->where('volunteer_id', $userId)
+            ->where('volunteer_id', $volunteerId)
             ->orderBy('Date', 'desc')
             ->orderBy('Time', 'desc')
-            ->get();
+            ->get()
+            ->map(function ($walk) {
+                $walk->datetime = \Carbon\Carbon::parse($walk->Date . ' ' . $walk->Time);
+                 $walk->can_note = $walk->datetime->greaterThan(now()->subHours(72)) &&
+                          $walk->datetime->lessThanOrEqualTo(now());
+                return $walk;});
     }
 
     else {
@@ -101,6 +177,124 @@ class DogsController extends Controller
 
     return view('dogs.walks', compact('walks', 'dog'));
 }
+
+
+
+public function reserveWalk(Request $request, $id)
+{
+    $volunteerId = $this->getVolunteerId();
+
+    if (!$volunteerId) {
+        return redirect('/login');
+    }
+
+    $dog = Dog::findOrFail($id);
+
+    $exists =DB::table('schedules')
+        ->where('dog_id', $dog->id)
+        ->where('Date', $request->walk_date)
+        ->where('Time', $request->walk_time)
+        ->exists();
+
+    if ($exists) {
+        return redirect()->back()
+            ->with('error', 'Ten termin jest już zajęty.');
+    }
+
+    $walkDateTime = \Carbon\Carbon::parse($request->walk_date . ' ' . $request->walk_time);
+
+    if ($walkDateTime->lessThanOrEqualTo(now())) {
+    return redirect()->back()
+        ->with('error', 'Termin niedostępny');
+}
+
+    DB::table('schedules')->insert([
+        'Date' => $request->walk_date,
+        'Time' => $request->walk_time,
+        'dog_id' => $dog->id,
+        'volunteer_id' => $volunteerId,
+        'supervisor_id' => \App\Models\Worker::first()->id,
+        'Note' => null,
+        'Grade' => null,
+    ]);
+
+    return redirect()->back()
+        ->with('success', 'Zarezerwowano spacer');
+}
+
+
+public function cancelWalk($scheduleId)
+{
+    $volunteerId = $this->getVolunteerId();
+
+    if (!$volunteerId) {
+        return redirect('/login');
+    }
+
+    $walk = DB::table('schedules')
+        ->where('id', $scheduleId)
+        ->where('volunteer_id', $volunteerId)
+        ->first();
+
+    if (!$walk) {
+        return redirect()->back();
+    }
+
+    $walkDateTime = \Carbon\Carbon::parse(
+        $walk->Date . ' ' . $walk->Time
+    );
+
+    if ($walkDateTime->lessThanOrEqualTo(now())) {
+        return redirect()->back()
+            ->with('error', 'Nie można anulować zakończonego spaceru.');
+    }
+
+    DB::table('schedules')
+        ->where('id', $scheduleId)
+        ->delete();
+
+    return redirect()->back()
+        ->with('success', 'Anulowano spacer');
+}
+
+////notatki i oceny do spaceru
+
+public function addNote(Request $request, $id)
+{
+    $volunteerId = $this->getVolunteerId();
+
+    if (!$volunteerId) {
+        return redirect('/login');
+    }
+
+    DB::table('schedules')
+        ->where('id', $id)
+        ->where('volunteer_id', $volunteerId)
+        ->update([
+            'Note' => $request->input('note')
+        ]);
+
+    return redirect()->back()->with('success', 'Dodano notatkę');
+}
+
+public function addGrade(Request $request, $id)
+{
+    if (!CurrUser::IsLogged() || CurrUser::getRole() !== 'Worker') {
+        return redirect()->back();
+    }
+
+    DB::table('schedules')
+        ->where('id', $id)
+        ->update([
+            'Grade' => $request->input('grade')
+        ]);
+
+    return redirect()->back()->with('success', 'Dodano ocenę');
+}
+
+
+
+//ulubione 
 
     public function toggleFavorite($id)
     {
@@ -112,7 +306,11 @@ class DogsController extends Controller
             return redirect('/dogs');
         }
 
-        $volunteerId = CurrUser::getId();
+        $volunteerId = $this->getVolunteerId();
+
+        if (!$volunteerId) {
+            return redirect('/dogs');
+        }
 
         $existing = Fav_Dog::where('dog_id', $id)
             ->where('volunteer_id', $volunteerId)
@@ -121,8 +319,7 @@ class DogsController extends Controller
         if ($existing) {
             $existing->delete();
 
-            return redirect('/dogs')
-                ->with('favorite_removed', true);
+            return redirect()->back()->with('favorite_removed', true);
         }
 
         Fav_Dog::create([
@@ -130,7 +327,6 @@ class DogsController extends Controller
             'volunteer_id' => $volunteerId
         ]);
 
-        return redirect('/dogs')
-            ->with('favorite_added', true);
+        return redirect()->back()->with('favorite_added', true);
     }
 }

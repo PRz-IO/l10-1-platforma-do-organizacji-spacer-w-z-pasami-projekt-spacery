@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Attributes\WithoutTimestamps;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\File;
 
 #[WithoutTimestamps]
 class Dog extends Model
@@ -25,5 +26,16 @@ class Dog extends Model
     public function schedules():HasMany
     {
         return $this->hasMany(Schedule::class);
+    }
+
+
+
+    public function getPhotoAttribute($value)
+    {
+        if (empty($value)) {
+        return asset('images/default_dog.png');
+        }
+
+        return $value;
     }
 }

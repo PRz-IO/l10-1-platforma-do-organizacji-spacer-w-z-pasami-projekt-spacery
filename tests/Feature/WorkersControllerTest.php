@@ -12,6 +12,8 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 // Only update test doesn't work
 // Other tests are suited for JSON controller responses but controller returns view
 // These tests actually work but need rewriting to show success
+
+// PRETTY MUCH REWRITE TESTS TO WORK ON VIEWS
 class WorkersControllerTest extends TestCase
 {
     use RefreshDatabase;
