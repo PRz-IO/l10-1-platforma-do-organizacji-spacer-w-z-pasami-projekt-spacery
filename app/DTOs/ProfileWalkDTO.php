@@ -8,13 +8,13 @@ class ProfileWalkDTO
     protected string $DName;
     protected string $Date;
     protected string $Time;
-    protected int $Grade;
+    protected ?int $Grade;
     protected string $Name;
     protected string $Last_Name;
     public function __construct(
         int $Id,string $DName,
         string $Date, string $Time,
-        int $Grade, string $Name,
+        ?int $Grade, string $Name,
         string $Last_Name
         )
     {
@@ -54,10 +54,10 @@ class ProfileWalkDTO
         $this->Time = $Time;
     }
 
-    public function getGrade():int{
+    public function getGrade():?int{
         return $this->Grade;
     }
-    public function setGrade(int $Grade){
+    public function setGrade(?int $Grade){
         $this->Grade = $Grade;
     }
 

@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\DTOs\ProfileDTO;
+use App\DTOs\ProfileWalkDTO;
+use App\Models\Schedule;
 use Illuminate\Http\Request;
 use App\Models\Volunteer;
 use App\Models\Worker;
@@ -36,4 +39,20 @@ class ProfilesController extends Controller
 
         return redirect('/login');
     }
+
+    public function index(){
+        if(!CurrUser::IsLogged()){
+            return redirect('/login');
+        }
+        $ProfileDTO = ProfileDTO::New(CurrUser::getId(),CurrUser::getRole());
+        error_log(print_r($ProfileDTO->getHistory(),true));
+        if($ProfileDTO->isEmpty()){
+            error_log("Bida");
+        }
+        else{
+            error_log("Jewish");
+        }
+        return view('Profile',compact('ProfileDTO'));
+    }
+
 }
