@@ -6,7 +6,6 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\WorkersController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ProfilesController;
-use App\Http\Controllers\HomeController;
 
 Route::view('/layout-test', 'components.layout');
 
