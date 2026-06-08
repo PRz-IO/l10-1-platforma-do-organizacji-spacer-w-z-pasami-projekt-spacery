@@ -5,12 +5,12 @@ Creating, updating and deleting workers should be available only to admin
 -->
 
 <x-layout>
-    <x-slot name="title">Pracownicy</x-slot>
+    <x-slot name="title">Zarządzanie Pracownikami</x-slot>
     
 
 
     <div class="container">
-        <h2>Lista pracowników</h2>
+        <h2>Panel Zarządzania Pracownikami</h2>
 
         @if(session('success'))
             <div style="background:#d4edda; padding:10px; margin-bottom:15px;">
@@ -42,97 +42,96 @@ Creating, updating and deleting workers should be available only to admin
         @else
             <ul style="padding:0;">
                 @foreach($workers as $worker)
-                    <!-- redefining this like this is dumb but will work for now -->
-                    @php
-                        $state = $worker->account?->Acc_State ?? 'Unknown';
-                        $stateLower = strtolower($state);
-                        $map = [
-                            'active' => ['#d4edda', '#155724', '#c3e6cb'],
-                            'blocked' => ['#f8d7da', '#721c24', '#f5c6cb'],
-                            'deleted' => ['#e2e3e5', '#383d41', '#d6d8db'],
-                            'default' => ['#fff3cd', '#856404', '#ffeeba'],
-                        ];
+                <!-- redefining this like this is dumb but will work for now -->
+                @php
+                    $state = $worker->account?->Acc_State ?? 'Unknown';
+                    $stateLower = strtolower($state);
+                    $map = [
+                        'active' => ['#d4edda', '#155724', '#c3e6cb'],
+                        'blocked' => ['#f8d7da', '#721c24', '#f5c6cb'],
+                        'deleted' => ['#e2e3e5', '#383d41', '#d6d8db'],
+                        'default' => ['#fff3cd', '#856404', '#ffeeba'],
+                    ];
 
-                    [$bg, $color, $border] = $map[$stateLower] ?? $map['default'];
+                [$bg, $color, $border] = $map[$stateLower] ?? $map['default'];
 
-                    @endphp
+                @endphp
 
-                    <li style="list-style:none; border:1px solid #ddd; padding:15px; margin-bottom:10px; border-radius:6px;">
+                <li style="list-style:none; border:1px solid #ddd; padding:15px; margin-bottom:10px; border-radius:6px;">
 
-                    <div>
+                <div>
 
-                        <strong style="font-size:18px;">
-                            {{ $worker->account?->Name ?? 'Brak' }}
-                            {{ $worker->account?->Last_Name ?? '' }}
-                        </strong>
-                        
-                        @if(\App\Utilities\CurrUser::IsLogged() && 
-                            \App\Utilities\CurrUser::getRole()=="Worker" &&
-                            \App\Utilities\CurrUser::getAcc_State() !="Pending"
-                        )
-                            <span style="
-                                margin-left:8px;
-                                padding:3px 8px;
-                                background: {{ $bg }};
-                                color: {{ $color }};
-                                border:1px solid {{ $border }};
-                                border-radius:4px;
-                                font-size:12px;
-                            ">
-                                {{ $state }}
-                            </span>
-                        @endif
-
-                        <br><br>
-
-                        <small>
-                            {{-- @if (\App\Utilities\CurrUser::IsLogged()) --}}
-                                
-
-                            @if(\App\Utilities\CurrUser::IsLogged() && 
-                                \App\Utilities\CurrUser::getRole()=="Worker" &&
-                                \App\Utilities\CurrUser::getAcc_State() !="Pending" &&
-                                \App\Utilities\CurrUser::getParam() ==True
-                            )
-                            
-                                Login: {{ $worker->account?->Login ?? '---' }}
-                                <br>
-                            @endif
-
-                            Email: {{ $worker->account?->Email ?? '---' }}
-
-                        </small>
-
-                        
-                        
-                        @if(\App\Utilities\CurrUser::IsLogged() && 
-                            \App\Utilities\CurrUser::getRole()=="Worker" &&
-                            \App\Utilities\CurrUser::getAcc_State() !="Pending"
-                        )
-                            <br><br>
-                            <span>
-                                Admin:
-                                <strong>{{ $worker->Is_Admin ? 'Tak' : 'Nie' }}</strong>
-                            </span>
-                        @endif
-
-                    </div>
-
-                    <div style="
-                        margin-top:15px;
-                        display:flex;
-                        flex-wrap:wrap;
-                        gap:8px;
+                    <strong style="font-size:18px;">
+                        {{ $worker->account?->Name ?? 'Brak' }}
+                        {{ $worker->account?->Last_Name ?? '' }}
+                    </strong>
+                    
+                    @if(\App\Utilities\CurrUser::IsLogged() && 
+                        \App\Utilities\CurrUser::getRole()=="Worker" &&
+                        \App\Utilities\CurrUser::getAcc_State() !="Pending"
+                    )
+                    <span style="
+                        margin-left:8px;
+                        padding:3px 8px;
+                        background: {{ $bg }};
+                        color: {{ $color }};
+                        border:1px solid {{ $border }};
+                        border-radius:4px;
+                        font-size:12px;
                     ">
+                        {{ $state }}
+                    </span>
+                    @endif
+
+                    <br><br>
+
+                    <small>
+                        {{-- @if (\App\Utilities\CurrUser::IsLogged()) --}}
+                            
+
+                        @if(\App\Utilities\CurrUser::IsLogged() && 
+                            \App\Utilities\CurrUser::getRole()=="Worker" &&
+                            \App\Utilities\CurrUser::getAcc_State() !="Pending" &&
+                            \App\Utilities\CurrUser::getParam() ==True
+                        )
+                        
+                            Login: {{ $worker->account?->Login ?? '---' }}
+                            <br>
+                        @endif
+
+                        Email: {{ $worker->account?->Email ?? '---' }}
+
+                    </small>
+
+                    <br><br>
+                    
+                    @if(\App\Utilities\CurrUser::IsLogged() && 
+                        \App\Utilities\CurrUser::getRole()=="Worker" &&
+                        \App\Utilities\CurrUser::getAcc_State() !="Pending"
+                    )
+                    <span>
+                        Admin:
+                        <strong>{{ $worker->Is_Admin ? 'Tak' : 'Nie' }}</strong>
+                    </span>
+                    @endif
+
+                </div>
+
+                <div style="
+                    margin-top:15px;
+                    display:flex;
+                    flex-wrap:wrap;
+                    gap:8px;
+                ">
                         @if(\App\Utilities\CurrUser::IsLogged() && 
                             \App\Utilities\CurrUser::getRole()=="Worker" &&
                             \App\Utilities\CurrUser::getAcc_State() !="Pending"
                         )
-                            <a href="{{ route('workers.show', $worker->id) }}">
-                                <button type="button">
-                                    Profil
-                                </button>
-                            </a>
+                        <a href="{{ route('workers.show', $worker->id) }}">
+                            <button type="button">
+                                Profil
+                            </button>
+                        </a>
 
                         @endif
 
@@ -142,28 +141,26 @@ Creating, updating and deleting workers should be available only to admin
                             \App\Utilities\CurrUser::getParam() ==True
                         )
 
-                            <a href="{{ route('workers.edit', $worker->id) }}">
-                                <button type="button">
-                                    Edytuj
-                                </button>
-                            </a>
+                        <a href="{{ route('workers.edit', $worker->id) }}">
+                            <button type="button">
+                                Edytuj
+                            </button>
+                        </a>
 
-                            <form method="POST"
-                                action="{{ route('workers.reset-password', $worker->id) }}"
-                                onsubmit="return confirm('Zresetować hasło pracownikowi?')">
-                                @csrf
+                        <form method="POST"
+                            action="{{ route('workers.reset-password', $worker->id) }}">
+                            @csrf
 
-                                <button type="submit"
-                                        style="background:#ffc107;">
-                                    Reset hasła
-                                </button>
-                            </form>
+                            <button type="submit"
+                                    style="background:#ffc107;">
+                                Reset hasła
+                            </button>
+                        </form>
 
                         @if($worker->account?->Acc_State === 'Active')
 
                             <form method="POST"
-                                action="{{ route('workers.block', $worker->id) }}"
-                                onsubmit="return confirm('Zablokować pracownika?')">
+                                action="{{ route('workers.block', $worker->id) }}">
                                 @csrf
                                 @method('PATCH')
 
@@ -176,8 +173,7 @@ Creating, updating and deleting workers should be available only to admin
                         @elseif($worker->account?->Acc_State === 'Blocked')
 
                             <form method="POST"
-                                action="{{ route('workers.unblock', $worker->id) }}"
-                                onsubmit="return confirm('Odblokować pracownika?')">
+                                action="{{ route('workers.unblock', $worker->id) }}">
                                 @csrf
                                 @method('PATCH')
 
@@ -190,8 +186,7 @@ Creating, updating and deleting workers should be available only to admin
                         @elseif($worker->account?->Acc_State === 'Pending')
 
                             <form method="POST"
-                                action="{{ route('workers.approve', $worker->id) }}"
-                                onsubmit="return confirm('Zatwierdzić pracownika?')">
+                                action="{{ route('workers.approve', $worker->id) }}">
                                 @csrf
                                 @method('PATCH')
 
@@ -205,7 +200,7 @@ Creating, updating and deleting workers should be available only to admin
 
                         <form action="{{ route('workers.destroy', $worker->id) }}"
                             method="POST"
-                            onsubmit="return confirm('Usunąć pracownika?')">
+                            onsubmit="return confirm('Oznaczyć pracownika jako usuniętego?')">
 
                             @csrf
                             @method('DELETE')
@@ -215,12 +210,12 @@ Creating, updating and deleting workers should be available only to admin
                                 Usuń
                             </button>
                         </form>
-                            
-                        @endif
+                        
+                    @endif
 
-                    </div>
+                </div>
 
-                    </li>
+                </li>
                 @endforeach
             </ul>
         @endif

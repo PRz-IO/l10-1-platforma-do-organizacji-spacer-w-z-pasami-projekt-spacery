@@ -17,7 +17,7 @@ actually create showing single worker info
         [$bg, $color, $border] = $map[$stateLower] ?? $map['default'];
     @endphp
     <div class="container">
-    <h2>Informacje o pracowniku</h2>
+    <h2>Pełne informacje o pracowniku</h2>
 
     @if(session('success'))
         <div style="background:#d4edda; padding:10px; margin-bottom:15px;">
@@ -87,8 +87,7 @@ actually create showing single worker info
             </a>
 
             <form method="POST"
-                action="{{ route('workers.reset-password', $worker->getKey()) }}"
-                onsubmit="return confirm('Zresetować hasło pracownikowi?')">
+                action="{{ route('workers.reset-password', $worker->getKey()) }}">
                 @csrf
 
                 <button type="submit"
@@ -100,8 +99,7 @@ actually create showing single worker info
             @if($worker->account?->Acc_State === 'Active')
 
                 <form method="POST"
-                    action="{{ route('workers.block', $worker->getKey()) }}"
-                    onsubmit="return confirm('Zablokować pracownika?')">
+                    action="{{ route('workers.block', $worker->getKey()) }}">
                     @csrf
                     @method('PATCH')
 
@@ -114,8 +112,7 @@ actually create showing single worker info
             @elseif($worker->account?->Acc_State === 'Blocked')
 
                 <form method="POST"
-                    action="{{ route('workers.unblock', $worker->getKey()) }}"
-                    onsubmit="return confirm('Odblokować pracownika?')">
+                    action="{{ route('workers.unblock', $worker->getKey()) }}">
                     @csrf
                     @method('PATCH')
 
@@ -128,8 +125,7 @@ actually create showing single worker info
             @elseif($worker->account?->Acc_State === 'Pending')
 
                 <form method="POST"
-                    action="{{ route('workers.approve', $worker->getKey()) }}"
-                    onsubmit="return confirm('Zatwierdzić pracownika?')">
+                    action="{{ route('workers.approve', $worker->getKey()) }}">
                     @csrf
                     @method('PATCH')
 
@@ -143,7 +139,7 @@ actually create showing single worker info
 
             <form method="POST"
                 action="{{ route('workers.destroy', $worker->getKey()) }}"
-                onsubmit="return confirm('Usunąć pracownika?')">
+                onsubmit="return confirm('Oznaczyć konto jako usunięte?')">
 
                 @csrf
                 @method('DELETE')
