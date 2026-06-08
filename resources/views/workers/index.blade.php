@@ -65,7 +65,11 @@ Creating, updating and deleting workers should be available only to admin
                         {{ $worker->account?->Name ?? 'Brak' }}
                         {{ $worker->account?->Last_Name ?? '' }}
                     </strong>
-
+                    
+                    @if(\App\Utilities\CurrUser::IsLogged() && 
+                        \App\Utilities\CurrUser::getRole()=="Worker" &&
+                        \App\Utilities\CurrUser::getAcc_State() !="Pending"
+                    )
                     <span style="
                         margin-left:8px;
                         padding:3px 8px;
@@ -77,6 +81,7 @@ Creating, updating and deleting workers should be available only to admin
                     ">
                         {{ $state }}
                     </span>
+                    @endif
 
                     <br><br>
 
@@ -99,11 +104,16 @@ Creating, updating and deleting workers should be available only to admin
                     </small>
 
                     <br><br>
-
+                    
+                    @if(\App\Utilities\CurrUser::IsLogged() && 
+                        \App\Utilities\CurrUser::getRole()=="Worker" &&
+                        \App\Utilities\CurrUser::getAcc_State() !="Pending"
+                    )
                     <span>
                         Admin:
                         <strong>{{ $worker->Is_Admin ? 'Tak' : 'Nie' }}</strong>
                     </span>
+                    @endif
 
                 </div>
 
@@ -113,12 +123,17 @@ Creating, updating and deleting workers should be available only to admin
                     flex-wrap:wrap;
                     gap:8px;
                 ">
+                        @if(\App\Utilities\CurrUser::IsLogged() && 
+                            \App\Utilities\CurrUser::getRole()=="Worker" &&
+                            \App\Utilities\CurrUser::getAcc_State() !="Pending"
+                        )
+                        <a href="{{ route('workers.show', $worker->id) }}">
+                            <button type="button">
+                                Profil
+                            </button>
+                        </a>
 
-                    <a href="{{ route('workers.show', $worker->id) }}">
-                        <button type="button">
-                            Profil
-                        </button>
-                    </a>
+                        @endif
 
                         @if(\App\Utilities\CurrUser::IsLogged() && 
                             \App\Utilities\CurrUser::getRole()=="Worker" &&

@@ -16,10 +16,12 @@ Route::get('workers/create', [WorkersController::class, 'create'])
     ->middleware('admin.worker')
     ->name('workers.create');
 
-Route::middleware('worker')->group(function () {
+Route::middleware('logged.in')->group(function () {
     Route::get('workers', [WorkersController::class, 'index'])
         ->name('workers.index');
+});
 
+Route::middleware('worker')->group(function () {
     Route::get('workers/{worker}', [WorkersController::class, 'show'])
         ->name('workers.show');
 });
