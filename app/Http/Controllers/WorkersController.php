@@ -182,8 +182,7 @@ class WorkersController extends Controller
             'Acc_State' => 'Active'
         ]);
 
-        return redirect()->back()
-    ->with('success', 'Pracownik został zatwierdzony.');
+        return redirect()->back()->with('success', 'Pracownik został zatwierdzony.');
     }
 
     public function resetPassword($id)
