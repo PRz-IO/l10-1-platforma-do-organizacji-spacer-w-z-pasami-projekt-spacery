@@ -13,8 +13,9 @@
             </div>
         @endif
 
-        <form method="POST" action="{{ route('workers.update', $worker->getKey()) }}">
-
+        <form method="POST" action="{{ route('workers.update', $worker->getKey()) }}"
+            onsubmit="return confirm('Zmienić dane pracownika?')">
+            
             @csrf
             @method('PUT')
 
