@@ -17,29 +17,43 @@
 
             <div style="display:flex;flex-direction:column;gap:8px;align-items:flex-start;text-align:left;">
 
-                <div style="display:flex;gap:8px;align-items:flex-start;">
+                <div class="FlexInfo">
                     <strong>Imię i nazwisko:</strong>
                     {{ $ProfileDTO->getName() }} {{ $ProfileDTO->getLast_Name() }}
                 </div>
 
-                <div style="display:flex;gap:8px;align-items:flex-start;">
+                <div class="FlexInfo">
                     <strong>Email:</strong>
                     {{ $ProfileDTO->getEmail() }}
                 </div>
 
-                <div style="display:flex;gap:8px;align-items:flex-start;">
+                <div class="FlexInfo">
                     <strong>Telefon:</strong>
                     {{ $ProfileDTO->getPhone_Num() }}
                 </div>
 
-                <div style="display:flex;gap:8px;align-items:flex-start;">
+                <div class="FlexInfo">
                     <strong>Login:</strong>
                     {{ $ProfileDTO->getLogin() }}
                 </div>
 
-                <div style="display:flex;gap:8px;align-items:flex-start;">
+                <div class="FlexInfo">
                     <strong>Doświadczenie:</strong>
                     {{ \App\Utilities\CurrUser::getParam() ? 'Tak' : 'Nie' }}
+                </div>
+
+                <div class="FlexInfo" style="width: 100%; justify-content: space-around;">
+                    <form method="POST" action="{{ route('profile.check') }}">
+                        @csrf
+                        <input type="hidden" name="type" value="ChPass">
+                        <button type="submit">Zmień Hasło</button>
+                    </form>
+                
+                    <form method="POST" action="{{ route('profile.check') }}">
+                        @csrf
+                        <input type="hidden" name="type" value="DelAcc" >
+                        <button type="submit" >Usuń Konto</button>
+                    </form>
                 </div>
            </div>
         </div> 
@@ -72,7 +86,8 @@
                                     @endif
                                 </div>
                                 <div class="HWalkCell" style="grid-row: span 2;">
-                                    <form method="" action="#">
+                                    <form method="POST" action="#">
+                                        @csrf
                                         <button type="submit" class="HWBtn">Szczegóły</button>
                                     </form>
                                 </div>

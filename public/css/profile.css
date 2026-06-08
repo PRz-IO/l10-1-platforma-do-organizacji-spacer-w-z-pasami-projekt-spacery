@@ -31,3 +31,14 @@
     margin: auto;
     width: 80%;
 }
+.FlexInfo{
+    display:flex;
+    gap:8px;
+    align-items:flex-start;
+}
+.Inp{
+    width: 50%;
+}
+.Btn{
+    width: 30%;
+}

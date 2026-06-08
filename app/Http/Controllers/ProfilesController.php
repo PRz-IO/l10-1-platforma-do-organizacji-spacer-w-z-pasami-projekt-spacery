@@ -54,5 +54,20 @@ class ProfilesController extends Controller
         }
         return view('Profile',compact('ProfileDTO'));
     }
+    
+    public function checkPass(Request $request){
+        if(!CurrUser::IsLogged()){
+            return redirect('/login');
+        }
+        return view('ProfileCheck')->with('Type',$request->input('type'));
+    }
+
+    public function Change(Request $request){
+        return;
+    }
+
+    public function Delete(Request $request){
+        return;
+    }
 
 }
