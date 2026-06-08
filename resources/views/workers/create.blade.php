@@ -19,7 +19,8 @@
             </div>
         @endif
 
-        <form method="POST" action="{{ route('workers.store') }}">
+        <form method="POST" action="{{ route('workers.store') }}"
+            onsubmit="return confirm('Dodać pracownika?')">
             @csrf
 
             <div style="
