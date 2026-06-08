@@ -14,6 +14,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'worker' => \App\Http\Middleware\WorkerMiddleware::class,
             'admin.worker' => \App\Http\Middleware\AdminWorkerMiddleware::class,
+            'logged.in' => \App\Http\Middleware\LoggedInMiddleware::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

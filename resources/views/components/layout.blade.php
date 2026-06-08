@@ -25,14 +25,12 @@
         </div>
         <div class="nav-links">
             <a 
-            @if (\App\Utilities\CurrUser::IsLogged() && 
-            \App\Utilities\CurrUser::getRole()=="Worker" &&
-            \App\Utilities\CurrUser::getAcc_State() =="Active")
+            @if (\App\Utilities\CurrUser::IsLogged())
                  href="{{ route('workers.index') }}"    
             @else
                 href="#" class="nav-dummy"
             @endif
-            >Zarządzanie Pracownikami</a>
+            >Pracownicy</a>
         </div>
         <div class="nav-links">
             <a href="{{ route('dogs.index') }}" >Psy</a>
