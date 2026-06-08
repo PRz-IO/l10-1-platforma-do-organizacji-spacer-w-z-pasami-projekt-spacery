@@ -79,8 +79,8 @@ Route::controller(SignupController::class)->group(function () {
 
 
 Route::controller(ProfilesController::class)->group(function () {
-    Route::get('/profile', 'show')->name('profile.show');
-    Route::get('/profileaha', 'index')->name('profile.index');
+    //Route::get('/profile', 'show')->name('profile.show');
+    Route::get('/profile', 'index')->name('profile.index');
     Route::post('/profile/check','checkPass')->name('profile.check');
     Route::put('/profile/change','Change')->name('profile.change');
     Route::delete('profile/delete','Delete')->name('profile.delete');

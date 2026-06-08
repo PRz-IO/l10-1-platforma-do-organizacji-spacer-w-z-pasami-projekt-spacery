@@ -12,6 +12,7 @@ use App\Models\Account;
 class LoginController extends Controller
 {
     public function index(){
+        error_log(Hash::make('123456'));
         return view('LogIn');
     }
 

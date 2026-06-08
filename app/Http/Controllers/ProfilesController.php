@@ -4,7 +4,10 @@ namespace App\Http\Controllers;
 
 use App\DTOs\ProfileDTO;
 use App\DTOs\ProfileWalkDTO;
+use App\Models\Account;
 use App\Models\Schedule;
+use Exception;
+use Hash;
 use Illuminate\Http\Request;
 use App\Models\Volunteer;
 use App\Models\Worker;
@@ -63,11 +66,40 @@ class ProfilesController extends Controller
     }
 
     public function Change(Request $request){
-        return;
+    //'rpassword'=>'required|string|min:6|max:80|same:password',    
+        try{
+            $request->validate([
+                'login' => 'required|string|max:80',
+                'password' => 'required|string|max:80',
+            ]);
+        }
+        catch(Exception $e){
+            return view('ProfileCheck')->with('Type','ChPass')->with('Err','Nie podano loginu lub hasła');
+        }
+        $Acc = Account::findOrFail(CurrUser::getId());
+        
+        if(! Hash::check($request->input('password'),$Acc->Password)){
+            return view('ProfileCheck')->with('Type','ChPass')->with('Err','Błędne aktualne hasło');
+        }
+        
+        if ($Acc) {
+            $Acc->update(['Acc_State' => 'Deleted']);
+        }
+        return redirect()->back()->with('success', 'Konto wolontariusza zostało aktywowane.');
+    return;
     }
 
     public function Delete(Request $request){
-        return;
+        
+        $Acc = Account::findOrFail(CurrUser::getId());
+        
+        if(! Hash::check($request->input('password'),$Acc->Password)){
+            return view('ProfileCheck')->with('Type','DelAcc')->with('Err','Błędne hasło');
+        }
+
+        $Acc->update(['Acc_State' => 'Deleted']);
+        CurrUser::LogOut();
+        return redirect()->route('login.login')->with('Err', 'Pomyślnie usunięto konto.');
     }
 
 }
