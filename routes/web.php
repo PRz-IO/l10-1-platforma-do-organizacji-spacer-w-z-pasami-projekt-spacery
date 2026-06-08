@@ -5,6 +5,7 @@ use App\Http\Controllers\SignupController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\WorkersController;
 use App\Http\Controllers\ProfilesController;
+use App\Http\Controllers\HomeController;
 
 Route::view('/layout-test', 'components.layout');
 
@@ -58,10 +59,7 @@ use App\Http\Controllers\WalksController;
 use App\Http\Controllers\DogsController;
 use App\Http\Controllers\FavDogsController;
 
-Route::get('/', function () {
-    return redirect("/test");
-    //return view('welcome');
-});
+Route::get('/', [HomeController::class, 'index'])->name('home');
 
 
 Route::controller(LoginController::class)->group(function () {
