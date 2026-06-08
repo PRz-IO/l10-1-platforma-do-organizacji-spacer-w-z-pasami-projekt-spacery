@@ -4,6 +4,7 @@ use App\Http\Controllers\LoginController;
 use App\Http\Controllers\SignupController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\WorkersController;
+use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ProfilesController;
 use App\Http\Controllers\HomeController;
 
@@ -59,6 +60,7 @@ use App\Http\Controllers\WalksController;
 use App\Http\Controllers\DogsController;
 use App\Http\Controllers\FavDogsController;
 
+Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
 
