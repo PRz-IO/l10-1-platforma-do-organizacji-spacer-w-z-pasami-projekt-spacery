@@ -2,7 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\DTOs\WorkerDTO;
+use App\DTOs\CreateWorkerDTO;
+use App\DTOs\UpdateWorkerDTO;
 use App\Models\Account;
 use App\Models\Worker;
 use Illuminate\Http\Request;
@@ -18,9 +19,6 @@ class WorkersController extends Controller
     public function index()
     {
         $query = Worker::with('account');
-
-        // hide deleted workers for non-admins
-        // Uncomment once logging in works
         if (!auth()->user()?->Is_Admin) {
             $query->whereHas('account', function ($q) {
                 $q->where('Acc_State', '!=', 'Deleted');
@@ -65,7 +63,7 @@ class WorkersController extends Controller
 
         $validated['Password'] = $password;
 
-        $dto = WorkerDTO::fromArray($validated);
+        $dto = CreateWorkerDTO::fromArray($validated);
 
         DB::transaction(function () use ($dto, $request) 
         {
@@ -89,16 +87,14 @@ class WorkersController extends Controller
             'Is_Admin' => 'nullable|boolean',
         ]);
 
-        $account->update([
-            'Name' => $validated['Name'],
-            'Last_Name' => $validated['Last_Name'],
-            'Email' => $validated['Email'],
-            'Phone_Num' => $validated['Phone_Num'],
-        ]);
+        $dto = UpdateWorkerDTO::fromArray($validated);
 
-        $worker->update([
-            'Is_Admin' => $request->boolean('Is_Admin'),
-        ]);
+        DB::transaction(function () use ($dto, $request, $account, $worker) 
+        {
+
+            $account->update($dto->toAccountArray());
+            $worker->update($dto->toWorkerArray());
+        });
 
         return redirect()->route('workers.index')->with('success', 'Dane pracownika zostały zaktualizowane.');
     }
@@ -169,8 +165,7 @@ class WorkersController extends Controller
             'Acc_State' => 'Active'
         ]);
 
-        return redirect()->back()
-    ->with('success', 'Pracownik został odblokowany.');
+        return redirect()->back()->with('success', 'Pracownik został odblokowany.');
     }
 
     public function approve($id)
@@ -182,8 +177,7 @@ class WorkersController extends Controller
             'Acc_State' => 'Active'
         ]);
 
-        return redirect()->back()
-    ->with('success', 'Pracownik został zatwierdzony.');
+        return redirect()->back()->with('success', 'Pracownik został zatwierdzony.');
     }
 
     public function resetPassword($id)

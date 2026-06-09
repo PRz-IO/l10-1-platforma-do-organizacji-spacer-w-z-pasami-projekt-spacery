@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 // TODO:
 // Split WorkerDTO into Create and Update Worker DTO
 
-final readonly class WorkerDTO
+final readonly class CreateWorkerDTO
 {
     public function __construct
     (
