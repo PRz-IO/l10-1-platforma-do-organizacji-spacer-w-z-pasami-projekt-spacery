@@ -59,14 +59,7 @@ class LoginController extends Controller
             $param=$acc->worker->Is_Admin;
         }
         $dto= new CurrentUserDTO($id,$role,$param,$state);
-        error_log($dto->getId() . $dto->getRole() . "P: " . $dto->getParam() ." S: ". $dto->getAcc_State());
         CurrUser::set($dto);
-        if(CurrUser::IsLogged()){
-            error_log("Zalogowany");
-        }
-        else{
-            error_log("Nie Zalogowany");
-        }
         return redirect('/test');
     }
 
