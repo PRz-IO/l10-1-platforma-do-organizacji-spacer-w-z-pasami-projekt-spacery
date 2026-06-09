@@ -87,7 +87,8 @@ actually create showing single worker info
             </a>
 
             <form method="POST"
-                action="{{ route('workers.reset-password', $worker->getKey()) }}">
+                action="{{ route('workers.reset-password', $worker->getKey()) }}"
+                onsubmit="return confirm('Zresetować hasło pracownikowi?')">
                 @csrf
 
                 <button type="submit"
@@ -99,7 +100,8 @@ actually create showing single worker info
             @if($worker->account?->Acc_State === 'Active')
 
                 <form method="POST"
-                    action="{{ route('workers.block', $worker->getKey()) }}">
+                    action="{{ route('workers.block', $worker->getKey()) }}"
+                    onsubmit="return confirm('Zablokować pracownika?')">
                     @csrf
                     @method('PATCH')
 
@@ -112,7 +114,8 @@ actually create showing single worker info
             @elseif($worker->account?->Acc_State === 'Blocked')
 
                 <form method="POST"
-                    action="{{ route('workers.unblock', $worker->getKey()) }}">
+                    action="{{ route('workers.unblock', $worker->getKey()) }}"
+                    onsubmit="return confirm('Odblokować pracownika?')">
                     @csrf
                     @method('PATCH')
 
@@ -125,7 +128,8 @@ actually create showing single worker info
             @elseif($worker->account?->Acc_State === 'Pending')
 
                 <form method="POST"
-                    action="{{ route('workers.approve', $worker->getKey()) }}">
+                    action="{{ route('workers.approve', $worker->getKey()) }}"
+                    onsubmit="return confirm('Zatwierdzić pracownika?')">
                     @csrf
                     @method('PATCH')
 
@@ -139,7 +143,7 @@ actually create showing single worker info
 
             <form method="POST"
                 action="{{ route('workers.destroy', $worker->getKey()) }}"
-                onsubmit="return confirm('Oznaczyć konto jako usunięte?')">
+                onsubmit="return confirm('Usunąć pracownika?')">
 
                 @csrf
                 @method('DELETE')
