@@ -80,33 +80,37 @@ class WalksController extends Controller
         return response()->json($response);
     }
     public function index()
-{
-    // Scenariusz A: Jesteś Pracownikiem
-    if (CurrUser::isLogged() && CurrUser::getRole() == "Worker") {
-    $today = date('Y-m-d'); // Pobieramy dzisiejszą datę
+    {
+        // Scenariusz A: Jesteś Pracownikiem
+        if (CurrUser::isLogged() && CurrUser::getRole() == "Worker") {
+        $today = date('Y-m-d'); // Pobieramy dzisiejszą datę
 
-    $supervisorWalks = DB::table('schedules')
-        ->join('dogs', 'schedules.dog_id', '=', 'dogs.id')
-        ->select('schedules.*', 'dogs.Name as dog_name')
-        ->where('schedules.supervisor_id', CurrUser::getId())
-        ->where('schedules.Date', '<', $today) // TYLKO spacery z datą mniejszą niż dzisiaj
-        ->whereNotNull('schedules.Note')       // Opcjonalnie: tylko jeśli wolontariusz już dodał notatkę
-        ->get();
-            
-    return view('walks.dashboard', compact('supervisorWalks'));
-}
+        $supervisorWalks = DB::table('schedules')
+            ->join('dogs', 'schedules.dog_id', '=', 'dogs.id')
+            ->select('schedules.*', 'dogs.Name as dog_name')
+            ->where('schedules.supervisor_id', CurrUser::getId())
+            ->where('schedules.Date', '<', $today) // TYLKO spacery z datą mniejszą niż dzisiaj
+            ->whereNotNull('schedules.Note')       // Opcjonalnie: tylko jeśli wolontariusz już dodał notatkę
+            ->get();
+                
+        return view('walks.dashboard', compact('supervisorWalks'));
+        }
 
     // Scenariusz B: Jesteś Wolontariuszem (lub gościem)
     $dogs = Dog::all();
     $myWalks = [];
     if (CurrUser::isLogged() && CurrUser::getRole() == "Volunteer") {
-        $myWalks = DB::table('schedules')
-            ->join('dogs', 'schedules.dog_id', '=', 'dogs.id')
-            ->select('schedules.*', 'dogs.Name as dog_name')
-            ->where('schedules.volunteer_id', CurrUser::getId())
-            ->orderBy('schedules.Date', 'desc')
-            ->get();
-    }
+            // Tłumaczymy account_id na volunteer_id
+            $realVolunteerId = DB::table('volunteers')->where('account_id', CurrUser::getId())->value('id');
+            
+            $myWalks = DB::table('schedules')
+                ->join('dogs', 'schedules.dog_id', '=', 'dogs.id')
+                ->select('schedules.*', 'dogs.Name as dog_name')
+                ->where('schedules.volunteer_id', $realVolunteerId) // <-- Tutaj poprawione
+                ->orderBy('schedules.Date', 'desc')
+                ->orderBy('schedules.Time', 'desc')
+                ->get();
+        }
 
     return view('walks.index', compact('dogs', 'myWalks'));
 }
@@ -173,12 +177,16 @@ class WalksController extends Controller
         $dog = Dog::findOrFail($id);
         $isFavorite = false;
 
-        // Sprawdzamy ulubione TYLKO jeśli użytkownik to zalogowany wolontariusz
         if (CurrUser::isLogged() && CurrUser::getRole() == "Volunteer") {
-            $isFavorite = DB::table('fav_dogs')
-                ->where('volunteer_id', CurrUser::getId())
-                ->where('dog_id', $dog->id)
-                ->exists();
+            // Tłumaczymy account_id na volunteer_id
+            $realVolunteerId = DB::table('volunteers')->where('account_id', CurrUser::getId())->value('id');
+            
+            if ($realVolunteerId) {
+                $isFavorite = DB::table('fav_dogs')
+                    ->where('volunteer_id', $realVolunteerId)
+                    ->where('dog_id', $dog->id)
+                    ->exists();
+            }
         }
 
         return view('walks.show', compact('dog', 'isFavorite'));
@@ -194,7 +202,22 @@ class WalksController extends Controller
         $dog = Dog::findOrFail($id);
         $date = $request->input('walk_date');
         $time = $request->input('walk_time');
-        $volunteerId = CurrUser::getId(); // Pobieramy poprawne ID z Waszej sesji
+        
+        // ZABEZPIECZENIE: Blokada rezerwacji godzin, które już minęły w danym dniu
+        if ($date == date('Y-m-d')) {
+            $currentHour = (int) date('H');
+            $selectedHour = (int) substr($time, 0, 2);
+            
+            if ($selectedHour <= $currentHour) {
+                return redirect()->back()->with('error', 'Nie możesz zarezerwować spaceru w godzinie, która już minęła.');
+            }
+        }
+
+        $volunteerId = DB::table('volunteers')->where('account_id', CurrUser::getId())->value('id');
+        
+        if (!$volunteerId) {
+            return redirect()->back()->with('error', 'Błąd: nie znaleziono profilu wolontariusza przypisanego do konta.');
+        }
 
         $existingWalk = DB::table('schedules')
             ->where('dog_id', $dog->id)
@@ -219,27 +242,31 @@ class WalksController extends Controller
 
     public function toggleFavorite(Request $request, $id)
     {
-        // Blokada: tylko wolontariusz może polubić psa
         if (!CurrUser::isLogged() || CurrUser::getRole() != "Volunteer") {
             return redirect()->back()->with('error', 'Brak uprawnień.');
         }
 
-        $volunteerId = CurrUser::getId();
+        // Tłumaczymy account_id na volunteer_id
+        $realVolunteerId = DB::table('volunteers')->where('account_id', CurrUser::getId())->value('id');
+
+        if (!$realVolunteerId) {
+            return redirect()->back()->with('error', 'Błąd: nie znaleziono profilu wolontariusza.');
+        }
 
         $existing = DB::table('fav_dogs')
-            ->where('volunteer_id', $volunteerId)
+            ->where('volunteer_id', $realVolunteerId)
             ->where('dog_id', $id)
             ->first();
 
         if ($existing) {
             DB::table('fav_dogs')
-                ->where('volunteer_id', $volunteerId)
+                ->where('volunteer_id', $realVolunteerId)
                 ->where('dog_id', $id)
                 ->delete();
             return redirect()->back()->with('success', 'Usunięto psa z ulubionych.');
         } else {
             DB::table('fav_dogs')->insert([
-                'volunteer_id' => $volunteerId,
+                'volunteer_id' => $realVolunteerId,
                 'dog_id' => $id
             ]);
             return redirect()->back()->with('success', 'Dodano psa do ulubionych!');

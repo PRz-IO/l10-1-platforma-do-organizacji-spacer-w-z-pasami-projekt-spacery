@@ -106,15 +106,31 @@
             let dogId = {{ $dog->id }};
             let timeSelect = document.getElementById('walk_time');
             
-            if (!timeSelect) return; // Przerywa skrypt, jeśli pracownik nie ma na ekranie tego pola
+            if (!timeSelect) return; 
             
             timeSelect.options[0].text = "-- Wybierz godzinę --";
             
+            // Pobieranie aktualnej daty i godziny
+            let now = new Date();
+            // Wyciągamy dzisiejszą datę w formacie YYYY-MM-DD
+            let todayStr = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0') + '-' + String(now.getDate()).padStart(2, '0');
+            let currentHour = now.getHours();
+
+            // Krok 1: Włącz wszystkie opcje na starcie, ale zablokuj te z przeszłości, jeśli data to "dzisiaj"
             document.querySelectorAll('.time-option').forEach(option => {
                 option.disabled = false;
-                option.text = option.value.substring(0, 5); 
+                let optionTime = option.value.substring(0, 5); 
+                let optionHour = parseInt(option.value.substring(0, 2));
+
+                if (date === todayStr && optionHour <= currentHour) {
+                    option.disabled = true;
+                    option.text = optionTime + ' (Czas minął)';
+                } else {
+                    option.text = optionTime;
+                }
             });
 
+            // Krok 2: Pobierz zajęte godziny z bazy i zablokuj je dodatkowo
             if(date) {
                 fetch(`/psy/${dogId}/zajete-godziny?date=${date}`)
                     .then(response => response.json())
