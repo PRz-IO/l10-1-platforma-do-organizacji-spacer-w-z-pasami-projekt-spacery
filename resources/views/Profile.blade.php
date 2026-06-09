@@ -84,7 +84,7 @@
             
                 @if ($ProfileDTO->isEmpty())
                     <p style="color:#777;">
-                        Du hast keine spaceren.
+                        Nie masz jeszcze żadnych odbytych spacerów.
                     </p>
                 @else
                     <div class="ProfInfo" style="overflow-y: scroll; max-height: 40vh;">
@@ -105,13 +105,13 @@
                                     @endif
                                 </div>
                                 <div class="HWalkCell" style="grid-row: span 2;">
-                                    <form method="GET" action="#">
-                                        @csrf
+                                    {{-- Poprawiona zmienna na wielką literę oraz użycie metody getId() --}}
+                                    <form method="GET" action="{{ route('walks.details', $Walk->getId()) }}">
                                         <button type="submit" class="HWBtn">Szczegóły</button>
                                     </form>
                                 </div>
                                 <div class="HWalkCell">
-                                    {{ $Walk->getDate() }} {{ $Walk->getTime() }}
+                                    {{ $Walk->getDate() }} {{ substr($Walk->getTime(), 0, 5) }}
                                 </div>
                                 <div class="HWalkCell">
                                     {{ $Walk->getName() }} {{ $Walk->getLast_Name() }}

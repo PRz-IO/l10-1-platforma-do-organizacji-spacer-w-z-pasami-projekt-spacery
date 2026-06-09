@@ -132,6 +132,8 @@ Route::post('/psy/{id}/ulubione', [WalksController::class, 'toggleFavorite'])->n
 
 Route::get('/spacery', [WalksController::class, 'index'])->name('walks.index');
 
+Route::get('/spacery/{id}/szczegoly', [WalksController::class, 'showDetails'])->name('walks.details');
+
 Route::post('/spacery/{schedule_id}/notatka', [WalksController::class, 'addNote'])->name('walks.addNote');
 
 Route::post('/spacery/{schedule_id}/ocena', [WalksController::class, 'addGrade'])->name('walks.addGrade');

@@ -6,16 +6,28 @@
         </h1>
 
         @php
-            $now = now();
+    // 1. Pobieramy aktualny czas w polskiej strefie
+    $now = \Carbon\Carbon::now('Europe/Warsaw');
 
-            $future = $walks->filter(function ($w) use ($now) {
-                return \Carbon\Carbon::parse($w->Date . ' ' . $w->Time)->greaterThan($now);
-            });
+    // 2. Jeśli zalogowany użytkownik to Wolontariusz, zawężamy listę spacerów tylko do jego własnych
+    if (\App\Utilities\CurrUser::getRole() === 'Volunteer') {
+        $realVolunteerId = \DB::table('volunteers')->where('account_id', \App\Utilities\CurrUser::getId())->value('id');
+        
+        $walks = $walks->filter(function ($w) use ($realVolunteerId) {
+            return $w->volunteer_id == $realVolunteerId;
+        });
+    }
 
-            $past = $walks->filter(function ($w) use ($now) {
-                return \Carbon\Carbon::parse($w->Date . ' ' . $w->Time)->lessThanOrEqualTo($now);
-            });
-        @endphp
+    // 3. Filtrujemy przyszłe spacery z już ograniczonej listy
+    $future = $walks->filter(function ($w) use ($now) {
+        return \Carbon\Carbon::parse($w->Date . ' ' . $w->Time, 'Europe/Warsaw')->greaterThan($now);
+    });
+
+    // 4. Filtrujemy przeszłe spacery z już ograniczonej listy
+    $past = $walks->filter(function ($w) use ($now) {
+        return \Carbon\Carbon::parse($w->Date . ' ' . $w->Time, 'Europe/Warsaw')->lessThanOrEqualTo($now);
+    });
+@endphp
 
 
         {{-- przyszłe spacery --}}
@@ -67,11 +79,10 @@
                                 </div>
                             @endif
                             <div><strong>Data:</strong> {{ $walk->Date }}</div>
-                            <div><strong>Godzina:</strong> {{ $walk->Time }}</div>
+                            <div><strong>Godzina:</strong> {{ substr($walk->Time, 0, 5) }}</div>
                         </div>
 
                         <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px;">
-
 
                             @if(\App\Utilities\CurrUser::IsLogged()
                                 && \App\Utilities\CurrUser::getRole() === 'Volunteer')
@@ -143,8 +154,9 @@
                 @foreach($past as $walk)
 
                     @php
-                        $walkDateTime = \Carbon\Carbon::parse($walk->Date . ' ' . $walk->Time);
-                        $canAddNote = $walkDateTime->greaterThanOrEqualTo(now()->subHours(72));
+                        // Tutaj też dbamy o polską strefę czasową
+                        $walkDateTime = \Carbon\Carbon::parse($walk->Date . ' ' . $walk->Time, 'Europe/Warsaw');
+                        $canAddNote = $walkDateTime->greaterThanOrEqualTo(\Carbon\Carbon::now('Europe/Warsaw')->subHours(72));
                     @endphp
 
                     <div style="
@@ -166,7 +178,7 @@
                                 </div>
                             @endif
                             <div><strong>Data:</strong> {{ $walk->Date }}</div>
-                            <div><strong>Godzina:</strong> {{ $walk->Time }}</div>
+                            <div><strong>Godzina:</strong> {{ substr($walk->Time, 0, 5) }}</div>
                             <div><strong>Notatka:</strong> {{ $walk->Note ?? '-' }}</div>
                             @if(!is_null($walk->Grade))
                             <div><strong>Ocena:</strong> {{ $walk->Grade }}</div>
@@ -254,7 +266,6 @@
 
                         </div>
 
-
                     </div>
 
                 @endforeach
@@ -262,109 +273,6 @@
             @endif
 
         </div>
-
-
-
-        {{-- nowy spacer --}}
-        @if(\App\Utilities\CurrUser::IsLogged()
-            && \App\Utilities\CurrUser::getRole() === 'Volunteer')
-
-            <div style="
-                border-top:2px solid #e0e0e0;
-                padding-top:20px;
-                margin-top:10px;
-            ">
-
-                <h4 style="
-                    margin:0 0 20px 0;
-                    color:#000;
-                    font-size:22px;
-                    font-weight:700;
-                ">
-                    Zarezerwuj nowy spacer
-                </h4>
-
-                <form action="{{ route('dogs.walks.reserve', $dog->id) }}"
-                      method="POST">
-
-                    @csrf
-
-                    <div style="margin-bottom:15px;">
-
-                        <label style="display:block;margin-bottom:5px;color:#555;font-size:15px;">
-                            Data spaceru
-                        </label>
-
-                        <input
-                            type="date"
-                            name="walk_date"
-                            required
-                            min="{{ date('Y-m-d') }}"
-                            style="
-                                padding:8px;
-                                border:1px solid #ccc;
-                                border-radius:6px;
-                            ">
-
-                    </div>
-
-                    <div style="margin-bottom:15px;">
-
-                        <label style="display:block;margin-bottom:5px;color:#555;font-size:15px;">
-                            Godzina spaceru
-                        </label>
-
-                        <select
-                            name="walk_time"
-                            required
-                            style="
-                                padding:8px;
-                                border:1px solid #ccc;
-                                border-radius:6px;
-                            ">
-
-                            @php
-                                $times = [
-                                    '08:00',
-                                    '09:00',
-                                    '10:00',
-                                    '11:00',
-                                    '12:00',
-                                    '13:00',
-                                    '14:00',
-                                    '15:00',
-                                    '16:00',
-                                    '17:00'
-                                ];
-                            @endphp
-
-                            @foreach($times as $time)
-                                <option value="{{ $time }}:00">
-                                    {{ $time }}
-                                </option>
-                            @endforeach
-
-                        </select>
-
-                    </div>
-
-                    <button type="submit"
-                            style="
-                                background:#007bff;
-                                color:white;
-                                border:none;
-                                padding:10px 15px;
-                                border-radius:6px;
-                                cursor:pointer;
-                            ">
-                        Zarezerwuj spacer
-                    </button>
-
-                </form>
-
-            </div>
-
-        @endif
 
     </div>
 </x-layout>
