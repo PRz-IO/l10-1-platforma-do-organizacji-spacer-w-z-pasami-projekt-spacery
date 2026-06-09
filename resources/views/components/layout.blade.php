@@ -5,114 +5,111 @@
     <title>{{ isset($title) ? $title : 'Test'}}</title>
     <link rel="stylesheet" href="{{ asset('css/default.css') }}">
     
-    {{-- Nowoczesne style dla odświeżonego Navbaru --}}
     <style>
+        /* Reset i style globalne */
         body {
             margin: 0;
             font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background-color: #fdfdfc;
+            background-color: #f8f9fa;
         }
 
         .navbar {
             display: flex;
-            align-items: center;
             justify-content: space-between;
-            background: #ffffff;
-            padding: 0 30px;
-            height: 65px;
-            border-bottom: 1px solid #e3e3e0;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-        }
-
-        .nav-brand {
-            font-size: 18px;
-            font-weight: bold;
-            color: #1b1b18;
-            text-decoration: none;
-            display: flex;
             align-items: center;
-            gap: 5px;
+            background-color: #ffffff;
+            padding: 0 2rem;
+            height: 70px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            border-bottom: 1px solid #eaeaea;
         }
 
+        /* Styl dla nazwy schroniska w lewym rogu */
+        .nav-brand a {
+            text-decoration: none;
+            color: #1a202c;
+            font-weight: 700;
+            font-size: 1.2rem;
+            letter-spacing: -0.5px;
+        }
+
+        /* Grupowanie linków (środek i prawa strona) */
         .nav-group {
             display: flex;
             align-items: center;
-            gap: 8px;
-        }
-
-        .nav-links {
-            display: flex;
-            align-items: center;
+            gap: 1rem;
         }
 
         .nav-links a {
-            color: #706f6c;
             text-decoration: none;
-            font-size: 14px;
+            color: #4a5568;
             font-weight: 500;
-            padding: 8px 14px;
+            font-size: 0.95rem;
+            padding: 0.5rem 0.8rem;
             border-radius: 6px;
-            transition: all 0.2s ease;
+            transition: all 0.2s ease-in-out;
         }
 
-        /* Efekt hover dla aktywnych linków */
+        /* Efekt najechania myszką */
         .nav-links a:hover:not(.nav-dummy) {
-            background-color: #f4f4f2;
-            color: #1b1b18;
+            background-color: #edf2f7;
+            color: #3182ce;
         }
 
-        /* Stylowanie zablokowanych opcji (Twoje nav-dummy) */
+        /* Styl dla zablokowanych opcji */
         .nav-links a.nav-dummy {
-            color: #c1c0bc !important;
+            color: #cbd5e0;
             cursor: not-allowed;
-            background: transparent !important;
+            pointer-events: none;
         }
 
-        /* Akcenty dla przycisków uwierzytelniania */
-        .nav-links a.login-btn {
-            color: #007bff;
-            border: 1px solid #e3e3e0;
-            margin-right: 4px;
+        /* Przyciski logowania / rejestracji / wylogowania */
+        .btn-login {
+            color: #3182ce !important;
+            border: 1px solid #3182ce;
         }
-        .nav-links a.login-btn:hover {
-            background-color: #f0f7ff;
-            border-color: #007bff;
+        .btn-login:hover {
+            background-color: #ebf8ff !important;
         }
-
-        .nav-links a.signup-btn {
-            background: #007bff;
-            color: white !important;
+        
+        .btn-register {
+            background-color: #3182ce;
+            color: #ffffff !important;
         }
-        .nav-links a.signup-btn:hover {
-            background: #0056b3;
+        .btn-register:hover {
+            background-color: #2b6cb0 !important;
         }
 
-        .nav-links a.logout-btn {
-            color: #dc3545;
+        .btn-logout {
+            color: #e53e3e !important;
         }
-        .nav-links a.logout-btn:hover {
-            background-color: #fff5f5;
+        .btn-logout:hover {
+            background-color: #fff5f5 !important;
+            color: #c53030 !important;
         }
 
         .main-content {
-            min-height: calc(100vh - 65px);
+            padding: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
         }
     </style>
     @stack('styles')
 </head>
 <body>
 
-    <nav class="navbar"> 
-        
-        {{-- Lewa strona: Nazwa aplikacji / Logo --}}
-        <a href="/" class="nav-brand">
-            Bark & Boop 🐾
-        </a>
+    <nav class="navbar">
+        <div style="background: #fff3cd; padding: 10px; font-size: 12px; color: #856404; text-align: center;">
+            Zalogowany: {{ \App\Utilities\CurrUser::IsLogged() ? 'TAK' : 'NIE' }} | 
+            Rola: "{{ \App\Utilities\CurrUser::getRole() }}" | 
+            Status: "{{ \App\Utilities\CurrUser::getAcc_State() }}"
+        </div>
+        {{-- 1. LEWA STRONA: Nazwa schroniska (Zawsze widoczna, bezpieczna) --}}
+        <div class="nav-brand">
+            <a href="/">Bark & Boop 🐾</a>
+        </div>
 
-        {{-- Środek: Główne linki nawigacyjne --}}
+        {{-- 2. ŚRODEK: Główne linki nawigacyjne --}}
         <div class="nav-group">
             <div class="nav-links">
                 <a href="{{ route('walks.index') }}">Spacery</a>
@@ -125,51 +122,47 @@
                 \App\Utilities\CurrUser::getAcc_State() !="Pending")
                      href="{{ route('worker.volunteers.index') }}"    
                 @else
-                    href="#" class="nav-dummy" title="Dostępne tylko dla zweryfikowanych pracowników"
+                    href="#" class="nav-dummy"
                 @endif
                 >Zarządzanie Wolontariuszami</a>
             </div>
             
             <div class="nav-links">
                 <a 
-                @if (\App\Utilities\CurrUser::IsLogged() && 
-                \App\Utilities\CurrUser::getRole()=="Worker" &&
-                \App\Utilities\CurrUser::getAcc_State() =="Active")
+                @if (\App\Utilities\CurrUser::IsLogged())
                      href="{{ route('workers.index') }}"    
                 @else
-                    href="#" class="nav-dummy" title="Dostępne tylko dla aktywnych pracowników"
+                    href="#" class="nav-dummy"
                 @endif
-                >Zarządzanie Pracownikami</a>
+                >Pracownicy</a>
             </div>
             
             <div class="nav-links">
-                <a href="{{ route('dogs.index') }}">Psy</a>
+                <a href="{{ route('dogs.index') }}" >Psy</a>
             </div>
         </div>
 
-        {{-- Prawa strona: Profil i Logowanie --}}
+        {{-- 3. PRAWA STRONA: Opcje konta --}}
         <div class="nav-group">
             @if (\App\Utilities\CurrUser::IsLogged())
                 <div class="nav-links">    
                     <a href="{{ route('profile') }}">Profil</a>
                 </div>
                 <div class="nav-links">    
-                    <a href="{{ route('login.logout') }}" class="logout-btn">Wyloguj</a>
+                    <a href="{{ route('login.logout') }}" class="btn-logout">Wyloguj</a>
                 </div>
             @else
                 <div class="nav-links">    
-                    <a href="{{ route('login.login') }}" class="login-btn">Zaloguj</a>
+                    <a href="{{ route('login.login') }}" class="btn-login">Zaloguj</a>
                 </div>
                 <div class="nav-links">    
-                    <a href="{{ route('signup.index') }}" class="signup-btn">Zarejestruj</a>
+                    <a href="{{ route('signup.index') }}" class="btn-register">Zarejestruj</a>
                 </div>
             @endif
         </div>
-
     </nav>
 
-    {{-- Główna treść strony --}}
-    <main class="main-content">                                                                 
+    <main class="main-content">                                                 
         {{ $slot }}
     </main>
 

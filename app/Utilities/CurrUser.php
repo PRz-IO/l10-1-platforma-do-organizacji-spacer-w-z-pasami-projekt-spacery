@@ -14,47 +14,36 @@ class CurrUser
         session(['IsLogged'=>True]);
         return;
     }
+    
     public static function LogOut():void{
         session()->forget(['Id','Role','Param','AccState']);
         session(['IsLogged'=>False]);
         return;
     }
+    
     public static function IsLogged():bool{
         return session('IsLogged',False);
     }
+
+    // --- TUTAJ SĄ BEZPIECZNE POPRAWKI ---
+
     public static function getId():int{
-        if(session()->has("Id")){
-            return session("Id");
-        }
-        else{
-            throw new \Exception("There is no Id set");
-        }
+        // Jeśli nie ma Id w sesji, zwróci bezpieczne 0 (typ int się zgadza)
+        return session("Id", 0); 
     }
 
     public static function getRole():string{
-        if(session()->has("Role")){
-            return session("Role");
-        }
-        else{
-            throw new \Exception("There is no Role set");
-        }
+        // Jeśli nie ma roli, zwróci pusty string (typ string się zgadza, brak crashu)
+        return session("Role", ''); 
     }
 
     public static function getParam():bool{
-        if(session()->has("Param")){
-            return session('Param');
-        }
-        else{
-            throw new \Exception("There is no Param set");
-        }
+        // Jeśli nie ma parametru, zwróci false (typ bool się zgadza)
+        return session('Param', false); 
     }
 
     public static function getAcc_State():string{
-        if(session()->has('AccState')){
-            return session('AccState');
-        }
-        else{
-            throw new \Exception("There is no Acc_State set");
-        }
+        // Jeśli nie ma stanu konta, zwróci pusty string
+        return session('AccState', ''); 
     }
 }
