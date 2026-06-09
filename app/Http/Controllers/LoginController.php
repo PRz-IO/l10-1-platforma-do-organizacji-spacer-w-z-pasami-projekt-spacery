@@ -63,7 +63,7 @@ class LoginController extends Controller
         else{
             error_log("Nie Zalogowany");
         }
-        return redirect('/test');
+        return redirect('/');
     }
 
     public function Logout(){
