@@ -17,7 +17,7 @@ class SignupController extends Controller
 
     public function SignUp(Request $request){
         try{
-            $val = $request->validate([
+            $request->validate([
                 'login' => 'required|string|min:3|max:80|unique:accounts,Login',
                 'email'=> 'required|string|max:80|email:rfc,strict|unique:accounts,Email',
                 'password' => 'required|string|min:6|max:80', 

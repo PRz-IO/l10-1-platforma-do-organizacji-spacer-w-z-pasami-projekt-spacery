@@ -14,6 +14,7 @@ use App\Models\Worker;
 use App\Utilities\CurrUser;
 use App\Models\Dog;
 use App\Models\Fav_Dog;
+use Session;
 
 
 class ProfilesController extends Controller
@@ -48,14 +49,10 @@ class ProfilesController extends Controller
             return redirect('/login');
         }
         $ProfileDTO = ProfileDTO::New(CurrUser::getId(),CurrUser::getRole());
-        error_log(print_r($ProfileDTO->getHistory(),true));
-        if($ProfileDTO->isEmpty()){
-            error_log("Bida");
-        }
-        else{
-            error_log("Jewish");
-        }
-        return view('Profile',compact('ProfileDTO'));
+        //error_log(print_r($ProfileDTO->getHistory(),true));
+        $WCount = Schedule::join('volunteers','schedules.volunteer_id','=','volunteers.id')
+        ->where('account_id',CurrUser::getId())->count('*');
+        return view('Profile',compact('ProfileDTO','WCount'))->with('Err',Session::get('Err'));
     }
     
     public function checkPass(Request $request){
@@ -65,17 +62,35 @@ class ProfilesController extends Controller
         return view('ProfileCheck')->with('Type',$request->input('type'));
     }
 
-    public function Change(Request $request){
-    //'rpassword'=>'required|string|min:6|max:80|same:password',    
+    public function Change(Request $request){   
         try{
             $request->validate([
-                'login' => 'required|string|max:80',
-                'password' => 'required|string|max:80',
+                'password' => 'required|string', 
+                'newpassword' => 'required|string',
+                'rnewpassword'=> 'required|string',
             ]);
         }
         catch(Exception $e){
-            return view('ProfileCheck')->with('Type','ChPass')->with('Err','Nie podano loginu lub hasła');
+            return view('ProfileCheck')->with('Type','ChPass')->with('Err','Nie podano wszystkich haseł');
         }
+
+        try{
+            $request->validate([
+                'newpassword' => 'min:6|max:80', 
+                'rnewpassword'=> 'min:6|max:80',
+            ]);
+        }
+        catch(Exception $e){
+            return view('ProfileCheck')->with('Type','ChPass')->with('Err','Nowe hasło jest za krótkie(min 6)');
+        }
+
+        
+        if($request->input('newpassword') != $request->input('rnewpassword')){
+            return view('ProfileCheck')->with('Type','ChPass')->with('Err','Hasła nie są takie same');
+        }
+
+
+
         $Acc = Account::findOrFail(CurrUser::getId());
         
         if(! Hash::check($request->input('password'),$Acc->Password)){
@@ -83,10 +98,9 @@ class ProfilesController extends Controller
         }
         
         if ($Acc) {
-            $Acc->update(['Acc_State' => 'Deleted']);
+            $Acc->update(['Password' => Hash::make($request->input('newpassword'))]);
         }
-        return redirect()->back()->with('success', 'Konto wolontariusza zostało aktywowane.');
-    return;
+        return redirect()->route('profile.index')->with('Err', 'Pomyślnie Zmieniono Hasło');
     }
 
     public function Delete(Request $request){

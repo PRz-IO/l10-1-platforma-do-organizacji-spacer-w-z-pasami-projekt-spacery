@@ -37,10 +37,22 @@
                     {{ $ProfileDTO->getLogin() }}
                 </div>
 
-                <div class="FlexInfo">
-                    <strong>Doświadczenie:</strong>
-                    {{ \App\Utilities\CurrUser::getParam() ? 'Tak' : 'Nie' }}
-                </div>
+                @if (\App\Utilities\CurrUser::getRole()=="Volunteer")
+                    <div class="FlexInfo">
+                        <strong>Łączna liczba spacerów:</strong>
+                        {{ $WCount }}
+                    </div>
+
+                    <div class="FlexInfo">
+                        <strong>Doświadczenie:</strong>
+                        {{ \App\Utilities\CurrUser::getParam() ? 'Tak' : 'Nie' }}
+                    </div>
+                @else
+                    <div class="FlexInfo">
+                        <strong>Administrator:</strong>
+                        {{ \App\Utilities\CurrUser::getParam() ? 'Tak' : 'Nie' }}
+                    </div>
+                @endif
 
                 <div class="FlexInfo" style="width: 100%; justify-content: space-around;">
                     <form method="POST" action="{{ route('profile.check') }}">
@@ -57,6 +69,13 @@
                 </div>
            </div>
         </div> 
+
+            @isset($Err)
+                <br><h4 style="justify-content: center; text-align: center;">
+                    {{ $Err }}
+                </h4><br>
+            @endisset
+
         <div class="ProfInfo" style="text-align: center;">
             <h2 style="margin:0 0 15px 0; text-align:center;">
                 Historia Spacerów
@@ -86,7 +105,7 @@
                                     @endif
                                 </div>
                                 <div class="HWalkCell" style="grid-row: span 2;">
-                                    <form method="POST" action="#">
+                                    <form method="GET" action="#">
                                         @csrf
                                         <button type="submit" class="HWBtn">Szczegóły</button>
                                     </form>
