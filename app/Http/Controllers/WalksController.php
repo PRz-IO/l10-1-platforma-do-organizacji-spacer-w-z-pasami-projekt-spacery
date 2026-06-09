@@ -83,17 +83,20 @@ class WalksController extends Controller
     {
         // Scenariusz A: Jesteś Pracownikiem
         if (CurrUser::isLogged() && CurrUser::getRole() == "Worker") {
-        $today = date('Y-m-d'); // Pobieramy dzisiejszą datę
+            $today = date('Y-m-d');
+            
+            // Tłumaczymy account_id na id z tabeli workers
+            $realWorkerId = DB::table('workers')->where('account_id', CurrUser::getId())->value('id');
 
-        $supervisorWalks = DB::table('schedules')
-            ->join('dogs', 'schedules.dog_id', '=', 'dogs.id')
-            ->select('schedules.*', 'dogs.Name as dog_name')
-            ->where('schedules.supervisor_id', CurrUser::getId())
-            ->where('schedules.Date', '<', $today) // TYLKO spacery z datą mniejszą niż dzisiaj
-            ->whereNotNull('schedules.Note')       // Opcjonalnie: tylko jeśli wolontariusz już dodał notatkę
-            ->get();
+            $supervisorWalks = DB::table('schedules')
+                ->join('dogs', 'schedules.dog_id', '=', 'dogs.id')
+                ->select('schedules.*', 'dogs.Name as dog_name')
+                ->where('schedules.supervisor_id', $realWorkerId) // Używamy prawdziwego ID pracownika
+                ->where('schedules.Date', '<', $today)
+                ->whereNotNull('schedules.Note')
+                ->get();
                 
-        return view('walks.dashboard', compact('supervisorWalks'));
+            return view('walks.dashboard', compact('supervisorWalks'));
         }
 
     // Scenariusz B: Jesteś Wolontariuszem (lub gościem)
@@ -122,10 +125,13 @@ class WalksController extends Controller
             return redirect()->back()->with('error', 'Brak uprawnień.');
         }
 
+        // Tłumaczymy account_id na volunteer_id
+        $realVolunteerId = DB::table('volunteers')->where('account_id', CurrUser::getId())->value('id');
+
         // Aktualizujemy rekord w tabeli schedules
         DB::table('schedules')
             ->where('id', $id)
-            ->where('volunteer_id', CurrUser::getId()) // Upewniamy się, że edytuje swój spacer
+            ->where('volunteer_id', $realVolunteerId) // Używamy poprawnego ID
             ->update([
                 'Note' => $request->input('note')
             ]);
@@ -135,42 +141,63 @@ class WalksController extends Controller
 
     public function addGrade(Request $request, $schedule_id)
     {
-        // 1. Sprawdzenie uprawnień: tylko pracownik (Supervisor)
+        // Sprawdzenie uprawnień
         if (!CurrUser::isLogged() || CurrUser::getRole() != "Worker") {
             return redirect()->back()->with('error', 'Tylko pracownik może oceniać spacery.');
         }
 
-        // 2. Aktualizacja oceny w bazie
-        DB::table('schedules')
+        // Tłumaczymy account_id na id z tabeli workers
+        $realWorkerId = DB::table('workers')->where('account_id', CurrUser::getId())->value('id');
+
+        if (!$realWorkerId) {
+            return redirect()->back()->with('error', 'Błąd: nie znaleziono profilu pracownika przypisanego do tego konta.');
+        }
+
+        // Aktualizacja oceny w bazie
+        $updated = DB::table('schedules')
             ->where('id', $schedule_id)
-            ->where('supervisor_id', CurrUser::getId()) // Pracownik ocenia tylko "swoje"
+            ->where('supervisor_id', $realWorkerId) // Pracownik ocenia tylko "swoje"
             ->update([
                 'Grade' => $request->input('grade')
             ]);
 
-        return redirect()->back()->with('success', 'Ocena została zapisana!');
+        if ($updated) {
+            return redirect()->back()->with('success', 'Ocena została zapisana!');
+        } else {
+            return redirect()->back()->with('error', 'Nie można dodać oceny do tego spaceru.');
+        }
     }
 
     public function cancelWalk($id)
-{
-    // Sprawdzamy czy to wolontariusz i czy spacer należy do niego
-    if (!CurrUser::isLogged() || CurrUser::getRole() != "Volunteer") {
-        return redirect()->back()->with('error', 'Brak uprawnień.');
-    }
+    {
+        if (!CurrUser::isLogged() || CurrUser::getRole() != "Volunteer") {
+            return redirect()->back()->with('error', 'Brak uprawnień.');
+        }
 
-    // Usuwamy tylko jeśli spacer jest w przyszłości (dla bezpieczeństwa)
-    $walk = DB::table('schedules')
-        ->where('id', $id)
-        ->where('volunteer_id', CurrUser::getId())
-        ->where('Date', '>=', date('Y-m-d'))
-        ->delete();
+        $realVolunteerId = DB::table('volunteers')->where('account_id', CurrUser::getId())->value('id');
 
-    if ($walk) {
+        // Pobieramy spacer, żeby sprawdzić jego dokładny czas
+        $walk = DB::table('schedules')
+            ->where('id', $id)
+            ->where('volunteer_id', $realVolunteerId)
+            ->first();
+
+        if (!$walk) {
+            return redirect()->back()->with('error', 'Nie znaleziono spaceru.');
+        }
+
+        // Sprawdzamy czy dokładny czas spaceru minął
+        $walkDateTime = \Carbon\Carbon::parse($walk->Date . ' ' . $walk->Time, 'Europe/Warsaw');
+
+        if ($walkDateTime->isPast()) {
+            return redirect()->back()->with('error', 'Nie można anulować spaceru, który już się rozpoczął lub odbył.');
+        }
+
+        // Jeśli czas jest w przyszłości - usuwamy
+        DB::table('schedules')->where('id', $id)->delete();
+
         return redirect()->back()->with('success', 'Spacer został anulowany.');
-    } else {
-        return redirect()->back()->with('error', 'Nie można anulować tego spaceru.');
     }
-}
 
     public function show($id)
     {
@@ -229,12 +256,20 @@ class WalksController extends Controller
             return redirect()->back()->with('error', 'Niestety, ' . $dog->Name . ' ma już zaplanowany spacer w tym terminie.');
         }
 
+        $randomWorkerId = DB::table('workers')->inRandomOrder()->value('id');
+
+        // 2. Awaryjne zabezpieczenie (gdyby tabela workers była pusta)
+        if (!$randomWorkerId) {
+            $randomWorkerId = 1;
+        }
+
+        // 3. Zapis do bazy z nowym, wylosowanym nadzorcą
         DB::table('schedules')->insert([
             'Date' => $date,
             'Time' => $time,
             'volunteer_id' => $volunteerId, 
             'dog_id' => $dog->id,
-            'supervisor_id' => 1, // Pozostawiam 1 awaryjnie dla klucza obcego Pawła
+            'supervisor_id' => $randomWorkerId, // Zamiast sztywnego 1, wstawiamy wylosowane ID
         ]);
 
         return redirect()->back()->with('success', 'Udało się! Spacer zarezerwowany.');
@@ -283,5 +318,36 @@ class WalksController extends Controller
             
         return response()->json($bookedTimes);
     }
+
+    public function showDetails($id)
+{
+    // 1. Pobieramy główny rekord spaceru
+    $walk = DB::table('schedules')->where('id', $id)->first();
+    
+    if (!$walk) {
+        abort(404, 'Nie znaleziono takiego spaceru.');
+    }
+
+    // 2. BEZPIECZEŃSTWO: Wolontariusz może zobaczyć TYLKO swój spacer
+    if (CurrUser::isLogged() && CurrUser::getRole() == "Volunteer") {
+        $realVolunteerId = DB::table('volunteers')->where('account_id', CurrUser::getId())->value('id');
+        
+        if ($walk->volunteer_id != $realVolunteerId) {
+            abort(403, 'Nie masz uprawnień do podglądania szczegółów tego spaceru.');
+        }
+    }
+    // Pracownik (Worker) i Admin przechodzą bez powyższej blokady automatycznie
+
+    // 3. Pobieramy szczegółowe dane psa
+    $dog = DB::table('dogs')->where('id', $walk->dog_id)->first();
+
+    // 4. Pobieramy dane zalogowanych osób do wyświetlenia (opcjonalnie)
+    $volunteerName = DB::table('volunteers')
+        ->where('id', $walk->volunteer_id)
+        ->select('id') // Tutaj możesz dociągnąć imię/nazwisko jeśli macie je w tabeli volunteers
+        ->first();
+
+    return view('walks.details', compact('walk', 'dog'));
+}
 
 }

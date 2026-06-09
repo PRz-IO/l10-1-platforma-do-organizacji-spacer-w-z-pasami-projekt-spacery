@@ -67,13 +67,18 @@
                     @endphp
 
                     @foreach($myWalks as $walk)
-                        <div class="history-card">
-                            <p class="h-date">📅 {{ $walk->Date }} o {{ substr($walk->Time, 0, 5) }}</p>
-                            <p class="h-dog">🐶 Pies: <strong>{{ $walk->dog_name }}</strong></p>
+                    @php
+                        // Łączymy datę i czas z bazy w jeden pełny obiekt Carbon
+                        $walkDateTime = \Carbon\Carbon::parse($walk->Date . ' ' . $walk->Time, 'Europe/Warsaw');
+                    @endphp
 
-                            @if($walk->Date > $today)
-                                <span class="status-badge status-future">Nadchodzący</span>
-    
+                    <div class="history-card">
+                        <p class="h-date">📅 {{ $walk->Date }} o {{ substr($walk->Time, 0, 5) }}</p>
+                        <p class="h-dog">🐶 Pies: <strong>{{ $walk->dog_name }}</strong></p>
+
+                        @if($walkDateTime->isFuture())
+                            <span class="status-badge status-future">Nadchodzący</span>
+
                             <form action="{{ route('walks.cancel', $walk->id) }}" method="POST" style="margin-top: 5px;">
                                 @csrf
                                 @method('DELETE')
@@ -84,24 +89,24 @@
                                     Anuluj spacer
                                 </button>
                             </form>
+                        @else
+                            <span class="status-badge status-past">Zakończony</span>
+                            
+                            @if(empty($walk->Note))
+                                <form action="{{ route('walks.addNote', $walk->id) }}" method="POST" style="margin-top: 10px;">
+                                    @csrf
+                                    <textarea name="note" class="note-input" placeholder="Jak zachowywał się pies?" required></textarea>
+                                    <button type="submit" class="btn-note">Zapisz notatkę</button>
+                                </form>
                             @else
-                                <span class="status-badge status-past">Zakończony</span>
-                                
-                                @if(empty($walk->Note))
-                                    <form action="{{ route('walks.addNote', $walk->id) }}" method="POST" style="margin-top: 10px;">
-                                        @csrf
-                                        <textarea name="note" class="note-input" placeholder="Jak zachowywał się pies?" required></textarea>
-                                        <button type="submit" class="btn-note">Zapisz notatkę</button>
-                                    </form>
-                                @else
-                                    <div class="existing-note" style="margin-top: 10px;">
-                                        <strong>Twoja notatka:</strong><br>
-                                        {{ $walk->Note }}
-                                    </div>
-                                @endif
+                                <div class="existing-note" style="margin-top: 10px;">
+                                    <strong>Twoja notatka:</strong><br>
+                                    {{ $walk->Note }}
+                                </div>
                             @endif
-                        </div>
-                    @endforeach
+                        @endif
+                    </div>
+                @endforeach
                 @else
                     <p style="color: #777; font-size: 14px;">Nie masz jeszcze żadnych zapisanych spacerów.</p>
                 @endif
