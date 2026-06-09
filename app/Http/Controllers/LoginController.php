@@ -8,11 +8,12 @@ use Exception;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\Request;
 use App\Models\Account;
+use Session;
 
 class LoginController extends Controller
 {
     public function index(){
-        return view('LogIn');
+        return view('LogIn')->with('Err',Session::get('Err'));
     }
 
     public function Login(Request $request){
@@ -37,7 +38,10 @@ class LoginController extends Controller
         if(! Hash::check($request->input('password'),$acc->Password)){
             return view('LogIn')->with('L',$L)->with('Err','Błędne hasło');
         }
-        if($acc->Acc_State == "Banned" || $acc->Acc_State == "Deleted"){
+        if($acc->Acc_State == "Deleted"){
+            return view('LogIn')->with('L',$L)->with('Err','Błędny Login');
+        }
+        if($acc->Acc_State == "Banned"){
             return view('LogIn')->with('Err','To konto jest zablokowane');
         }
         $id=$acc->id;
@@ -55,14 +59,7 @@ class LoginController extends Controller
             $param=$acc->worker->Is_Admin;
         }
         $dto= new CurrentUserDTO($id,$role,$param,$state);
-        error_log($dto->getId() . $dto->getRole() . "P: " . $dto->getParam() ." S: ". $dto->getAcc_State());
         CurrUser::set($dto);
-        if(CurrUser::IsLogged()){
-            error_log("Zalogowany");
-        }
-        else{
-            error_log("Nie Zalogowany");
-        }
         return redirect('/test');
     }
 

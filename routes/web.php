@@ -78,6 +78,14 @@ Route::controller(SignupController::class)->group(function () {
 });
 
 
+Route::controller(ProfilesController::class)->group(function () {
+    //Route::get('/profile', 'show')->name('profile.show');
+    Route::get('/profile', 'index')->name('profile.index');
+    Route::post('/profile/check','checkPass')->name('profile.check');
+    Route::put('/profile/change','Change')->name('profile.change');
+    Route::delete('profile/delete','Delete')->name('profile.delete');
+});
+
 Route::get('/test', function () {
     return view('test');
 })->name('test');
@@ -131,5 +139,4 @@ Route::post('/spacery/{schedule_id}/ocena', [WalksController::class, 'addGrade']
 Route::delete('/spacery/{schedule_id}/anuluj', [WalksController::class, 'cancelWalk'])->name('walks.cancel');
 
 
-//profil
-Route::get('/profile', [ProfilesController::class, 'show'])->name('profile');
+

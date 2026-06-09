@@ -2,6 +2,10 @@
 
 namespace App\DTOs;
 
+use App\Models\Schedule;
+use App\Models\Volunteer;
+use App\Models\Worker;
+
 class ProfileDTO
 {
     protected string $Name;
@@ -11,10 +15,11 @@ class ProfileDTO
     protected string $Email;
     protected string $Phone_Num;
     protected array $History;
-    /*
+
     public function __construct(
         string $Name,string $Last_Name,
         string $Login,string $Creation_Date,
+        string $Email,string $Phone_Num,
         array $History
         )
     {
@@ -22,9 +27,11 @@ class ProfileDTO
         $this->Last_Name = $Last_Name;
         $this->Login = $Login;
         $this->Creation_Date = $Creation_Date;
+        $this->Email = $Email;
+        $this->Phone_Num = $Phone_Num;
         $this->History = $History;
     }
-    */
+
     public function getName():string{
         return $this->Name;
     }
@@ -72,5 +79,54 @@ class ProfileDTO
     }
     public function setPhone_Num(string $Phone_Num){
         $this->Login = $Phone_Num;
+    }
+
+    public function toArray():array{
+        return [
+            'Name' => $this->Name,
+            'Last_Name' => $this->Last_Name,
+            'Login' => $this->Login,
+            'Creation_Date'=> $this->Creation_Date,
+            'History' => $this->History
+        ];
+    }
+
+    public function isEmpty():bool{
+        return empty($this->History);
+    }
+
+    public static function New(int $Id, string $Role): self{
+        $history = [];
+        if ($Role === 'Volunteer') {
+            $profile = Volunteer::where('account_id', $Id)->first();
+            $schedules = Schedule::where('volunteer_id',$profile->id)->orderByDesc('Date')->get();
+            //error_log(print_r($walkdto,true));
+            foreach($schedules as $walk){
+                $walkdto = new ProfileWalkDTO(
+                    $walk->id, $walk->dog->Name,
+                    $walk->Date, $walk->Time,
+                    $walk->Grade, $walk->worker->account->Name,
+                    $walk->worker->account->Last_Name);
+                $history[]=$walkdto;
+            }
+        }
+
+        if ($Role === 'Worker') {
+            $profile = Worker::where('account_id', $Id)->first();
+            $schedules = Schedule::where('supervisor_id',$profile->id)->orderByDesc('Date')->get();
+            foreach($schedules as $walk){
+                $walkdto = new ProfileWalkDTO(
+                    $walk->id, $walk->dog->Name,
+                    $walk->Date, $walk->Time,
+                    $walk->Grade, $walk->volunteer->account->Name,
+                    $walk->volunteer->account->Last_Name);
+                $history[]=$walkdto;
+            }
+        }
+        return new self(
+            $profile->account->Name, $profile->account->Last_Name,
+            $profile->account->Login, $profile->account->Creation_Date,
+            $profile->account->Email, $profile->account->Phone_Num,
+            $history);
     }
 }

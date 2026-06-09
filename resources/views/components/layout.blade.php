@@ -39,7 +39,7 @@
 
         @if (\App\Utilities\CurrUser::IsLogged())
         <div class="nav-links">    
-        <a href="{{ route('profile') }}">Profil</a>
+        <a href="{{ route('profile.index') }}">Profil</a>
         </div>
         <div class="nav-links">    
         <a href="{{ route('login.logout') }}">Wyloguj</a>

@@ -3,12 +3,12 @@
         <link rel="stylesheet" href="{{ asset('css/signup.css') }}">
     @endpush
     <div class="container" style="padding: 0px; height: 90vh;">
-        <div class="haikyuu">
+        <div id="haikyuu">
             <div style="display: flex; align-items: center; text-align: center;">
             <h2 style=" margin: 0px; padding: 0px;">Rejestracja</h2><br><br>
             </div>
             
-            <form class="haikyuu1" action="{{ route('signup.signup') }}" method="post">
+            <form id="haikyuu1" action="{{ route('signup.signup') }}" method="post">
                 @csrf
                 <div>
                     <label for="login">Login:</label>
