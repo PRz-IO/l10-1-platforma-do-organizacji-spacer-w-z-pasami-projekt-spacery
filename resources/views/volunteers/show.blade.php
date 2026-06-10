@@ -125,7 +125,7 @@
                                                 <span style="color: #888; font-style: italic; font-size: 13px;">Brak oceny</span>
                                             @endif
                                         </div>
-                                        <a href="#" style="text-decoration: none;">
+                                        <a href="{{ route('walks.details', $schedule->id) }}" style="text-decoration: none;">
                                             <span style="background: #007bff; color: white; display: inline-block; padding: 6px 12px; font-size: 13px; border-radius: 4px; font-weight: 500; cursor: pointer;">
                                                 Szczegóły spaceru &rarr;
                                             </span>
