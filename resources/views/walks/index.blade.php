@@ -28,7 +28,7 @@
         <div class="main-content">
             <div class="page-header">
                 <h1>Nasi Podopieczni</h1>
-                <p>Wybierz psa, aby poznać go bliżej i umówić się na spacer.</p>
+                <p>Oto dostępne pieski.Wybierz jednego aby umówić się na spacer.</p>
             </div>
 
             <div class="dogs-grid">
@@ -44,7 +44,7 @@
                             <h2 class="dog-name">{{ $dog->Name }}</h2>
                             <div class="dog-details">
                                 <p><strong>Wiek:</strong> {{ $dog->Age }} lat</p>
-                                <p><strong>Stan:</strong> {{ $dog->State }}</p>
+                                <p><strong>Stan:</strong> {{ \App\Utilities\DogState::label($dog->State) }}</p>
                             </div>
                             <a href="{{ url('/psy/' . $dog->id) }}" class="btn-profile">Zobacz profil</a>
                         </div>

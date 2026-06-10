@@ -80,40 +80,43 @@ class WalksController extends Controller
         return response()->json($response);
     }
     public function index()
-    {
-        // Scenariusz A: Jesteś Pracownikiem
-        if (CurrUser::isLogged() && CurrUser::getRole() == "Worker") {
-            $today = date('Y-m-d');
-            
-            // Tłumaczymy account_id na id z tabeli workers
-            $realWorkerId = DB::table('workers')->where('account_id', CurrUser::getId())->value('id');
+{
+    // Scenariusz A: Jesteś Pracownikiem
+    if (CurrUser::isLogged() && CurrUser::getRole() == "Worker") {
+        $today = date('Y-m-d');
+        
+        // Tłumaczymy account_id na id z tabeli workers
+        $realWorkerId = DB::table('workers')->where('account_id', CurrUser::getId())->value('id');
 
-            $supervisorWalks = DB::table('schedules')
-                ->join('dogs', 'schedules.dog_id', '=', 'dogs.id')
-                ->select('schedules.*', 'dogs.Name as dog_name')
-                ->where('schedules.supervisor_id', $realWorkerId) // Używamy prawdziwego ID pracownika
-                ->where('schedules.Date', '<', $today)
-                ->whereNotNull('schedules.Note')
-                ->get();
-                
-            return view('walks.dashboard', compact('supervisorWalks'));
-        }
+        $supervisorWalks = DB::table('schedules')
+            ->join('dogs', 'schedules.dog_id', '=', 'dogs.id')
+            ->select('schedules.*', 'dogs.Name as dog_name')
+            ->where('schedules.supervisor_id', $realWorkerId) // Używamy prawdziwego ID pracownika
+            ->where('schedules.Date', '<', $today)
+            ->whereNotNull('schedules.Note')
+            ->get();
+            
+        return view('walks.dashboard', compact('supervisorWalks'));
+    }
 
     // Scenariusz B: Jesteś Wolontariuszem (lub gościem)
-    $dogs = Dog::all();
+    // 👇 TUTAJ: Zamiast Dog::all() pobieramy tylko psy, które nie są chore ani martwe
+    // (Upewnij się, czy w bazie kolumna nazywa się 'status', 'state' czy np. 'stan')
+    $dogs = Dog::whereNotIn('State', ['sick', 'dead'])->get();
+    
     $myWalks = [];
     if (CurrUser::isLogged() && CurrUser::getRole() == "Volunteer") {
-            // Tłumaczymy account_id na volunteer_id
-            $realVolunteerId = DB::table('volunteers')->where('account_id', CurrUser::getId())->value('id');
-            
-            $myWalks = DB::table('schedules')
-                ->join('dogs', 'schedules.dog_id', '=', 'dogs.id')
-                ->select('schedules.*', 'dogs.Name as dog_name')
-                ->where('schedules.volunteer_id', $realVolunteerId) // <-- Tutaj poprawione
-                ->orderBy('schedules.Date', 'desc')
-                ->orderBy('schedules.Time', 'desc')
-                ->get();
-        }
+        // Tłumaczymy account_id na volunteer_id
+        $realVolunteerId = DB::table('volunteers')->where('account_id', CurrUser::getId())->value('id');
+        
+        $myWalks = DB::table('schedules')
+            ->join('dogs', 'schedules.dog_id', '=', 'dogs.id')
+            ->select('schedules.*', 'dogs.Name as dog_name')
+            ->where('schedules.volunteer_id', $realVolunteerId)
+            ->orderBy('schedules.Date', 'desc')
+            ->orderBy('schedules.Time', 'desc')
+            ->get();
+    }
 
     return view('walks.index', compact('dogs', 'myWalks'));
 }
