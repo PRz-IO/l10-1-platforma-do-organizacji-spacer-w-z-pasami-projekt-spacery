@@ -105,6 +105,11 @@
                                 </div>
                             @endif
                         @endif
+                        <form method="GET" action="{{ route('walks.details', $walk->id) }}" style="margin-top: 10px;">
+                        <button type="submit" class="btn-note" style="background: #6c757d; color: white; width: 100%;">
+                            🔍 Szczegóły spaceru
+                        </button>
+                        </form>
                     </div>
                 @endforeach
                 @else
