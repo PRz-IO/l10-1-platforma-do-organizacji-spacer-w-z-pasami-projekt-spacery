@@ -60,7 +60,7 @@ class LoginController extends Controller
         }
         $dto= new CurrentUserDTO($id,$role,$param,$state);
         CurrUser::set($dto);
-        return redirect('/test');
+        return redirect('/');
     }
 
     public function Logout(){

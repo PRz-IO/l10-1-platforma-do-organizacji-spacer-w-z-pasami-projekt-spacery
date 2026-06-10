@@ -83,7 +83,7 @@
                                 <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
                                     
                                     <a href="{{ route('worker.volunteers.show', $volunteer->id) }}" style="text-decoration: none;">
-                                        <span style="background: #007bff; color: white; display: inline-block; padding: 6px 12px; font-size: 13px; border-radius: 4px; font-weight: 500; cursor: pointer;">Historia & Profil</span>
+                                        <span style="background: #007bff; color: white; display: inline-block; padding: 6px 12px; font-size: 13px; border-radius: 4px; font-weight: 500; cursor: pointer;">Profil & Historia </span>
                                     </a>
                                     
                                     @if($stateLower != 'deleted')
