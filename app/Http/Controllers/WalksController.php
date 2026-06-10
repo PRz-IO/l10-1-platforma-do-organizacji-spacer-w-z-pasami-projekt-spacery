@@ -85,13 +85,12 @@ class WalksController extends Controller
         if (CurrUser::isLogged() && CurrUser::getRole() == "Worker") {
             $today = date('Y-m-d');
             
-            // Tłumaczymy account_id na id z tabeli workers
             $realWorkerId = DB::table('workers')->where('account_id', CurrUser::getId())->value('id');
 
             $supervisorWalks = DB::table('schedules')
                 ->join('dogs', 'schedules.dog_id', '=', 'dogs.id')
                 ->select('schedules.*', 'dogs.Name as dog_name')
-                ->where('schedules.supervisor_id', $realWorkerId) // Używamy prawdziwego ID pracownika
+                ->where('schedules.supervisor_id', $realWorkerId)
                 ->where('schedules.Date', '<', $today)
                 ->whereNotNull('schedules.Note')
                 ->get();
@@ -99,24 +98,43 @@ class WalksController extends Controller
             return view('walks.dashboard', compact('supervisorWalks'));
         }
 
-    // Scenariusz B: Jesteś Wolontariuszem (lub gościem)
-    $dogs = Dog::all();
-    $myWalks = [];
-    if (CurrUser::isLogged() && CurrUser::getRole() == "Volunteer") {
-            // Tłumaczymy account_id na volunteer_id
-            $realVolunteerId = DB::table('volunteers')->where('account_id', CurrUser::getId())->value('id');
-            
-            $myWalks = DB::table('schedules')
-                ->join('dogs', 'schedules.dog_id', '=', 'dogs.id')
-                ->select('schedules.*', 'dogs.Name as dog_name')
-                ->where('schedules.volunteer_id', $realVolunteerId) // <-- Tutaj poprawione
-                ->orderBy('schedules.Date', 'desc')
-                ->orderBy('schedules.Time', 'desc')
-                ->get();
+        // Scenariusz B: Jesteś Wolontariuszem (lub gościem)
+        // 1. Tworzymy bazowe zapytanie dla psów (zawsze odrzucamy chore i martwe)
+        $dogsQuery = Dog::whereNotIn('State', ['sick', 'dead']);
+        
+        $myWalks = [];
+        
+        if (CurrUser::isLogged() && CurrUser::getRole() == "Volunteer") {
+            // Pobieramy dane wolontariusza z bazy (zarówno ID jak i poziom doświadczenia)
+            $volunteerData = DB::table('volunteers')
+                ->where('account_id', CurrUser::getId())
+                ->first();
+
+            if ($volunteerData) {
+                $realVolunteerId = $volunteerData->id;
+                
+                // 👇 TUTAJ: Jeśli wolontariusz NIE JEST doświadczony, ukrywamy trudne psy
+                if ($volunteerData->Is_Experienced == 0) {
+                    $dogsQuery->where('State', '!=', 'Difficult');
+                }
+                
+                // Pobieramy spacery bez notatki dla tego wolontariusza
+                $myWalks = DB::table('schedules')
+                    ->join('dogs', 'schedules.dog_id', '=', 'dogs.id')
+                    ->select('schedules.*', 'dogs.Name as dog_name')
+                    ->where('schedules.volunteer_id', $realVolunteerId)
+                    ->whereNull('schedules.Note')
+                    ->orderBy('schedules.Date', 'desc')
+                    ->orderBy('schedules.Time', 'desc')
+                    ->get();
+            }
         }
 
-    return view('walks.index', compact('dogs', 'myWalks'));
-}
+        // 2. Na samym końcu wykonujemy przygotowane wcześniej zapytanie o psy
+        $dogs = $dogsQuery->get();
+
+        return view('walks.index', compact('dogs', 'myWalks'));
+    }
 
     public function addNote(Request $request, $id)
     {
