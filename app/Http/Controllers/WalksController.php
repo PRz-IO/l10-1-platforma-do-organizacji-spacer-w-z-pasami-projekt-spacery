@@ -339,7 +339,7 @@ class WalksController extends Controller
 
     public function showDetails($id)
 {
-    // 1. Pobieramy główny rekord spaceru
+    // 1. Pobieramy główny rekord spaceru (zwraca czysty obiekt stdClass)
     $walk = DB::table('schedules')->where('id', $id)->first();
     
     if (!$walk) {
@@ -354,16 +354,27 @@ class WalksController extends Controller
             abort(403, 'Nie masz uprawnień do podglądania szczegółów tego spaceru.');
         }
     }
-    // Pracownik (Worker) i Admin przechodzą bez powyższej blokady automatycznie
 
     // 3. Pobieramy szczegółowe dane psa
     $dog = DB::table('dogs')->where('id', $walk->dog_id)->first();
 
-    // 4. Pobieramy dane zalogowanych osób do wyświetlenia (opcjonalnie)
-    $volunteerName = DB::table('volunteers')
-        ->where('id', $walk->volunteer_id)
-        ->select('id') // Tutaj możesz dociągnąć imię/nazwisko jeśli macie je w tabeli volunteers
-        ->first();
+    // 4. RĘCZNE BUDOWANIE STRUKTURY DLA WIDOKU BLADE ($walk->volunteer->account->Name)
+    // Pobieramy rekord wolontariusza przypisanego do spaceru
+    $volunteer = DB::table('volunteers')->where('id', $walk->volunteer_id)->first();
+
+    if ($volunteer) {
+        // Pobieramy dane konta tego wolontariusza. 
+        // Używamy orWhere, aby kod zadziałał niezależnie od tego, czy klucz w tabeli accounts to 'id' czy 'account_id'
+        $account = DB::table('accounts')
+            ->where('id', $volunteer->account_id) 
+            ->first();
+
+        // Łączymy obiekty w strukturę drzewiastą akceptowaną przez Blade
+        $volunteer->account = $account;
+        $walk->volunteer = $volunteer;
+    } else {
+        $walk->volunteer = null;
+    }
 
     return view('walks.details', compact('walk', 'dog'));
 }

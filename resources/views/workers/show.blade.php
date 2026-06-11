@@ -207,10 +207,10 @@ actually create showing single worker info
                 {{ $schedule->dog?->Name ?? '-' }}
             </td>
 
-            <td style="padding:10px; border:1px solid #ddd;">
+            <td style="padding:10px; border:1px solid #ddd; text-align: center;">
                 
                 @if($schedule->Grade)
-                    <div style="color:gold; font-size:16px;">
+                    <div style="color:gold; font-size:16px; margin-bottom: 10px;">
                         {{ str_repeat('★', $schedule->Grade) }}
                         <span style="color:#ccc;">
                             {{ str_repeat('☆', 5 - $schedule->Grade) }}
@@ -220,18 +220,14 @@ actually create showing single worker info
                         </small>
                     </div>
                 @else
-                    <div>-</div>
+                    <div style="margin-bottom: 10px;">-</div>
                 @endif
 
-                <div style="margin-top:8px;">
-                    <!-- UNCOMMENT ONCE schedules.show exists -->
-                    {{-- <a href="{{ route('walks.show', $schedule->id) }}"> --}}
-                    <a href="">
-                        <button style="padding:4px 8px; font-size:12px;">
-                            Szczegóły
-                        </button>
-                    </a>
-                </div>
+                <form method="GET" action="{{ route('walks.details', $schedule->id) }}" style="display: inline-block;">
+                    <button type="submit" class="HWBtn" style="background: #007bff; color: white; border: none; padding: 6px 12px; border-radius: 5px; cursor: pointer; font-size: 14px;">
+                        Szczegóły
+                    </button>
+                </form>
 
             </td>
         </tr>
