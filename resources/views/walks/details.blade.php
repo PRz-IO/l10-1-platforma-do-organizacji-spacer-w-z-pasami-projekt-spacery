@@ -38,6 +38,20 @@
                 </div>
             </div>
 
+            {{-- Sekcja Wolontariusza --}}
+            <div style="margin-bottom: 25px; border-top: 1px solid #f0f0f0; padding-top: 20px;">
+                <h4 style="margin: 0 0 10px 0; color: #555; text-transform: uppercase; font-size: 12px; letter-spacing: 1px;">Wolontariusz</h4>
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <span style="font-size: 24px;">👤</span>
+                    <div>
+                        <strong style="font-size: 18px; color: #000;">
+                            {{ $walk->volunteer?->account?->Name ?? 'Brak danych' }} 
+                            {{ $walk->volunteer?->account?->Last_Name ?? '' }}
+                        </strong>
+                    </div>
+                </div>
+            </div>
+
             {{-- Sekcja Notatki Wolontariusza --}}
             <div style="margin-bottom: 25px; border-top: 1px solid #f0f0f0; padding-top: 20px;">
                 <h4 style="margin: 0 0 10px 0; color: #555; text-transform: uppercase; font-size: 12px; letter-spacing: 1px;">Raport ze spaceru (Notatka)</h4>

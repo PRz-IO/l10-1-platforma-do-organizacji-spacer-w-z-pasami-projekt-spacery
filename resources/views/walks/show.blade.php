@@ -49,7 +49,7 @@
             <div class="info-card">
                 <h3>Podstawowe informacje</h3>
                 <p><strong>Wiek:</strong> {{ $dog->Age }} lat</p>
-                <p><strong>Stan:</strong> {{ $dog->State }}</p>
+                <p><strong>Stan:</strong> {{ \App\Utilities\DogState::label($dog->State) }}</p>
             </div>
             
             <div class="info-card" style="background: #f0f7ff; border-color: #cce3ff;">
