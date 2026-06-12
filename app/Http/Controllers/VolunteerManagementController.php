@@ -9,33 +9,33 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use App\Models\Schedule;
+use App\DTOs\VolunteerDTO; // <-- Import klasy DTO
 
 class VolunteerManagementController extends Controller
 {
     public function index(Request $request)
-{
-    $search = $request->input('search');
+    {
+        $search = $request->input('search');
 
-    $query = Volunteer::query()
-        ->join('accounts', 'volunteers.account_id', '=', 'accounts.id')
-        ->select('volunteers.*')
-        ->with('account')
-        ->withAvg('schedules as average_rating', 'Grade'); 
+        $query = Volunteer::query()
+            ->join('accounts', 'volunteers.account_id', '=', 'accounts.id')
+            ->select('volunteers.*')
+            ->with('account')
+            ->withAvg('schedules as average_rating', 'Grade'); 
 
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('accounts.Last_Name', 'like', "%{$search}%")
+                  ->orWhere('accounts.Name', 'like', "%{$search}%")
+                  ->orWhere('accounts.Login', 'like', "%{$search}%");
+            });
+        }
+        $volunteers = $query->orderBy('accounts.Name', 'asc')
+                            ->orderBy('accounts.Last_Name', 'asc')
+                            ->get();
 
-    if ($search) {
-        $query->where(function ($q) use ($search) {
-            $q->where('accounts.Last_Name', 'like', "%{$search}%")
-              ->orWhere('accounts.Name', 'like', "%{$search}%")
-              ->orWhere('accounts.Login', 'like', "%{$search}%");
-        });
+        return view('volunteers.index', compact('volunteers', 'search'));
     }
-    $volunteers = $query->orderBy('accounts.Name', 'asc')
-                        ->orderBy('accounts.Last_Name', 'asc')
-                        ->get();
-
-    return view('volunteers.index', compact('volunteers', 'search'));
-}
 
     public function create()
     {
@@ -44,38 +44,33 @@ class VolunteerManagementController extends Controller
 
     public function store(Request $request)
     {
-        // 1. Dodajemy walidację - w tym regułę 'unique' dla Phone_Num
+        // 1. Walidacja unikalności danych wejściowych
         $validated = $request->validate([
             'Name' => 'required',
             'Last_Name' => 'required',
             'Login' => 'required|unique:accounts,Login',
             'Email' => 'required|email|unique:accounts,Email',
-            'Phone_Num' => 'required|unique:accounts,Phone_Num', // <--- TO JEST KLUCZOWE
+            'Phone_Num' => 'required|unique:accounts,Phone_Num',
         ], [
-            // Opcjonalne: czytelne komunikaty po polsku
             'Phone_Num.unique' => 'Ten numer telefonu jest już przypisany do innego konta w systemie.',
             'Email.unique' => 'Ten email jest już zajęty.',
             'Login.unique' => 'Ten login jest już zajęty.',
         ]);
 
+        // 2. Generowanie losowego hasła startowego
         $randomPassword = substr(str_shuffle('abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ123456789'), 0, 8);
 
-        // 2. Jeśli walidacja przejdzie, kod wykonuje się bezpiecznie
-        DB::transaction(function () use ($validated, $request, $randomPassword) {
-            $account = Account::create([
-                'Name' => $validated['Name'],
-                'Last_Name' => $validated['Last_Name'],
-                'Login' => $validated['Login'],
-                'Password' => Hash::make($randomPassword),
-                'Email' => $validated['Email'],
-                'Phone_Num' => $validated['Phone_Num'], // Teraz walidator pilnuje, by to było unikalne
-                'Acc_State' => 'Pending',
-                'Creation_Date' => now()->format('Y-m-d'),
-            ]);
+        // 3. Inicjalizacja obiektu DTO z przekazaniem wygenerowanego hasła
+        $dto = VolunteerDTO::fromRequest($request, $randomPassword);
+
+        // 4. Bezpieczny zapis transakcyjny w bazie danych przy użyciu struktury z DTO
+        DB::transaction(function () use ($dto) {
+            // toAccountArray() dostarcza kompletną tablicę z już zahashowanym hasłem
+            $account = Account::create($dto->toAccountArray());
 
             Volunteer::create([
                 'account_id' => $account->id, 
-                'Is_Experienced' => $request->has('Is_Experienced'),
+                'Is_Experienced' => $dto->isExperienced,
             ]);
         });
 
@@ -194,6 +189,7 @@ class VolunteerManagementController extends Controller
         return redirect()->back()
         ->with('success', "Hasło dla wolontariusza zostało zresetowane na: <strong style='font-family: Consolas, Courier New, monospace; font-size: 16px; background: #fff; padding: 4px 8px; border: 1px solid #ced4da; border-radius: 4px; letter-spacing: 2px; color: #dc3545;'>{$newPassword}</strong>");
     }
+
     public function rateSchedule(Request $request, $id)
     {
         $validated = $request->validate([
