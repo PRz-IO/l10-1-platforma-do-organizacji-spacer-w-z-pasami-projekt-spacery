@@ -23,7 +23,7 @@ class VolunteerManagementTest extends TestCase
             'Login' => 'jkowalski',
             'Email' => 'jan@example.com',
             'Phone_Num' => '123456789',
-            'Is_Experienced' => true,
+            'Is_Experienced' => 'on',
         ];
 
         $response = $this->post(route('worker.volunteers.store'), $payload);
@@ -120,7 +120,6 @@ class VolunteerManagementTest extends TestCase
         ]);
         $volunteer = Volunteer::create(['account_id' => $account->id]);
 
-        // Zmieniono na PATCH zgodnie z web.php
         $response = $this->from(route('worker.volunteers.index'))
                          ->patch(route('worker.volunteers.approve', $volunteer->id));
 
@@ -144,7 +143,6 @@ class VolunteerManagementTest extends TestCase
         ]);
         $volunteer = Volunteer::create(['account_id' => $account->id]);
 
-        // Zmieniono na PATCH zgodnie z web.php
         $response = $this->from(route('worker.volunteers.show', $volunteer->id))
                          ->patch(route('worker.volunteers.block', $volunteer->id));
 
@@ -192,7 +190,6 @@ class VolunteerManagementTest extends TestCase
         ]);
         $volunteer = Volunteer::create(['account_id' => $account->id]);
 
-        // Poprawiono metodę na PATCH i nazwę trasy na 'volunteers.reset-password'
         $response = $this->from(route('worker.volunteers.show', $volunteer->id))
                          ->patch(route('worker.volunteers.reset-password', $volunteer->id));
 
@@ -201,7 +198,6 @@ class VolunteerManagementTest extends TestCase
 
         $account->refresh();
 
-        // Upewniamy się, że hasło zostało zaktualizowane (jest inne niż stary hash)
         $this->assertNotEquals($oldPasswordHash, $account->Password);
     }
 }
