@@ -36,7 +36,7 @@ class LoginController extends Controller
 
         //$acc = Account::where('Login',$L)->where('Password',$request->input('password'))->first();
         if(! Hash::check($request->input('password'),$acc->Password)){
-            return view('LogIn')->with('L',$L)->with('Err','Błędne hasło');
+            return view('LogIn')->with('L',$L)->with('Err','Błędne Hasło');
         }
         if($acc->Acc_State == "Deleted"){
             return view('LogIn')->with('L',$L)->with('Err','Błędny Login');
