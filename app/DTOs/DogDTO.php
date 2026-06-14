@@ -10,8 +10,9 @@ class DogDTO
         public readonly string $name,
         public readonly int $age,
         public readonly string $behaviour,
-        public readonly string $state = 'Ready',
-        public readonly string $photo
+        public readonly string $photo,
+        public readonly string $state = 'Ready'
+        
     ) {}
 
     
@@ -21,8 +22,9 @@ class DogDTO
             name: $request->input('Name'),
             age: (int) $request->input('Age'),
             behaviour: $request->input('Behaviour'),
-            state: $request->input('State', 'Ready'),
-            photo: $request->input('Photo')
+            photo: $request->input('Photo'),
+            state: $request->input('State', 'Ready')
+            
         );
     }
 
