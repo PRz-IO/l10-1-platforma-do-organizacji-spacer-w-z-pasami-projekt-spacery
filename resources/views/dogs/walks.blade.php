@@ -6,10 +6,8 @@
         </h1>
 
         @php
-    // 1. Pobieramy aktualny czas w polskiej strefie
     $now = \Carbon\Carbon::now('Europe/Warsaw');
 
-    // 2. Jeśli zalogowany użytkownik to Wolontariusz, zawężamy listę spacerów tylko do jego własnych
     if (\App\Utilities\CurrUser::getRole() === 'Volunteer') {
         $realVolunteerId = \DB::table('volunteers')->where('account_id', \App\Utilities\CurrUser::getId())->value('id');
         
@@ -18,12 +16,10 @@
         });
     }
 
-    // 3. Filtrujemy przyszłe spacery z już ograniczonej listy
     $future = $walks->filter(function ($w) use ($now) {
         return \Carbon\Carbon::parse($w->Date . ' ' . $w->Time, 'Europe/Warsaw')->greaterThan($now);
     });
 
-    // 4. Filtrujemy przeszłe spacery z już ograniczonej listy
     $past = $walks->filter(function ($w) use ($now) {
         return \Carbon\Carbon::parse($w->Date . ' ' . $w->Time, 'Europe/Warsaw')->lessThanOrEqualTo($now);
     });
@@ -154,7 +150,6 @@
                 @foreach($past as $walk)
 
                     @php
-                        // Tutaj też dbamy o polską strefę czasową
                         $walkDateTime = \Carbon\Carbon::parse($walk->Date . ' ' . $walk->Time, 'Europe/Warsaw');
                         $canAddNote = $walkDateTime->greaterThanOrEqualTo(\Carbon\Carbon::now('Europe/Warsaw')->subHours(72));
                     @endphp

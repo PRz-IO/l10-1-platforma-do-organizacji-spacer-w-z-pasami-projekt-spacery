@@ -63,12 +63,23 @@ private function uploadPhoto($request, $existingPhoto = null): string
         }
     }
 
-    $favoriteDogs = $dogs->whereIn('id', $favDogIds);
-    $otherDogs = $dogs->whereNotIn('id', $favDogIds);
+    $favoriteDogs = $dogs->whereIn('id', $favDogIds)->sortBy('Name');
+    $otherDogs = $dogs->whereNotIn('id', $favDogIds)->sortBy('Name');
+
+    $readyDogs = $otherDogs->where('State','Ready');
+    $difficultDogs = $otherDogs->where('State','Difficult');
+    $sickDogs = $otherDogs->where('State','Sick');
+    $deadDogs = $otherDogs->where('State','Dead');
+
 
     return view('dogs.index', compact(
         'favoriteDogs',
         'otherDogs',
+        'favDogIds',
+        'readyDogs',
+        'difficultDogs',
+        'sickDogs',
+        'deadDogs',
         'favDogIds'
     ));
 }
