@@ -35,60 +35,29 @@ class ProfileDTO
     public function getName():string{
         return $this->Name;
     }
-    public function setName(string $Name){
-        $this->Name = $Name;
-    }
 
     public function getLast_Name():string{
         return $this->Last_Name;
-    }
-    public function setLast_Name(string $Last_Name){
-        $this->Last_Name = $Last_Name;
     }
 
     public function getLogin():string{
         return $this->Login;
     }
-    public function setLogin(string $Login){
-        $this->Login = $Login;
-    }
 
     public function getCreation_Date():string{
         return $this->Creation_Date;
-    }
-    public function setCreation_Date(string $Creation_Date){
-        $this->Creation_Date = $Creation_Date;
     }
 
     public function getHistory():array{
         return $this->History;
     }
-    public function setHistory(array $History){
-        $this->History = $History;
-    }
 
     public function getEmail():string{
         return $this->Email;
     }
-    public function setEmail(string $Email){
-        $this->Login = $Email;
-    }
 
     public function getPhone_Num():string{
         return $this->Phone_Num;
-    }
-    public function setPhone_Num(string $Phone_Num){
-        $this->Login = $Phone_Num;
-    }
-
-    public function toArray():array{
-        return [
-            'Name' => $this->Name,
-            'Last_Name' => $this->Last_Name,
-            'Login' => $this->Login,
-            'Creation_Date'=> $this->Creation_Date,
-            'History' => $this->History
-        ];
     }
 
     public function isEmpty():bool{
@@ -100,7 +69,6 @@ class ProfileDTO
         if ($Role === 'Volunteer') {
             $profile = Volunteer::where('account_id', $Id)->first();
             $schedules = Schedule::where('volunteer_id',$profile->id)->orderByDesc('Date')->get();
-            //error_log(print_r($walkdto,true));
             foreach($schedules as $walk){
                 $walkdto = new ProfileWalkDTO(
                     $walk->id, $walk->dog->Name,

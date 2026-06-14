@@ -22,6 +22,9 @@
             @isset($Err)
                 <h5>
                     {{ $Err }}
+                    @php
+                        session()->forget('Err');
+                    @endphp
                 </h5>
             @endisset
         <br><br><br>
