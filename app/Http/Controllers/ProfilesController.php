@@ -48,6 +48,10 @@ class ProfilesController extends Controller
             return view('ProfileCheck')->with('Type','ChPass')->with('Err','Nie podano wszystkich haseł');
         }
 
+        if($request->input('newpassword') != $request->input('rnewpassword')){
+            return view('ProfileCheck')->with('Type','ChPass')->with('Err','Hasła nie są takie same');
+        }
+        
         try{
             $request->validate([
                 'newpassword' => 'min:6|max:80', 
@@ -59,9 +63,7 @@ class ProfilesController extends Controller
         }
 
         
-        if($request->input('newpassword') != $request->input('rnewpassword')){
-            return view('ProfileCheck')->with('Type','ChPass')->with('Err','Hasła nie są takie same');
-        }
+        
 
 
 
