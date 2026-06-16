@@ -53,6 +53,6 @@ class SignupController extends Controller
         }
         $Curr = new CurrentUserDTO($Acc->id,$request->input('role'),False,'Pending');
         CurrUser::set($Curr);
-        return view('test')->with('Err','Pomyślnie stworzono konto');
+        return view('dashboard');
     }
 }
